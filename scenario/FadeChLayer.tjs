@@ -500,6 +500,8 @@ class FadeChLayer extends FadeLayer {
 
 		// ƒ‹ƒr
 		if(ruby!="") {
+			if(vertical) { rx += ch_width; }
+//			var rubybase = fontsize > ch_height ? (fontsize+ch_height)/2:ch_height;
 			font.height=rubysize; font.bold=rubybold; font.face=rubyface;
 			drawText_adv(rx, ry, ruby, color, 255, ml.antialiased, eEm, esC, ee, sX, sY);
 			font.face=fontface; font.bold=fontbold; font.height=fontsize;
@@ -508,6 +510,7 @@ class FadeChLayer extends FadeLayer {
 		if(ischar && (edge || shadow)) {
 			drawGraphShadow(cx, cy, lay, color, ischar, edge, shadow, ee, esC, eEm, sX, sY);
 			operateRect(0, 0, cl, 0, 0, width, height, omAlpha, 255);
+			cl.fillRect(0, 0, cl.width, cl.height, 0x00000000); // ŽŸ‰ñ‚É”õ‚¦‚ÄƒNƒŠƒA‚µ‚Æ‚­
 		} else {
 			operateRect(cx, cy, lay, 0, 0, width, height, omAlpha, 255);
 		}
@@ -520,6 +523,7 @@ class FadeChLayer extends FadeLayer {
 	//		OperateGradation(cx, cy, ch_width, ch_height);
 	//		operateRect(cx, cy, cl, 0, 0, cl.width, cl.height, omPsLighten , 255);
 	//	}
+//		drawEdge(this, 0, 0, width, height, 0xFFFFFFFF);
 
 		if(rot!="n" || rotMove!="n") {	// ‰ñ“]
 			textwidth = ch_width; textheight = ch_height;

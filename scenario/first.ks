@@ -1,6 +1,6 @@
 @iscript
 Scripts.execStorage("MessageLayerADV.tjs");
-//Scripts.execStorage("SubRoutine2.tjs");
+Scripts.execStorage("SubRoutine2.tjs");
 @endscript
 @call storage="samplemacro.ks"
 ; Å™ É}ÉNÉçì«Ç›çûÇ›
@@ -59,7 +59,7 @@ Scripts.execStorage("MessageLayerADV.tjs");
 
 ;* ADD
 ;@deffont edge=false shadow=false edgecolor=0xff0000 edgeextent=2 edgeemphasis=1024
-;@position vertical=true
+@position vertical=true
 @deffont edge shadow=false edgecolor=0xff0000 edgeextent=2 edgeemphasis=1024
 
 ;@deffont edge=false shadow shadowcolor=0xff0000 shadowoffsetx=4 shadowoffsety=4
@@ -79,9 +79,10 @@ Scripts.execStorage("MessageLayerADV.tjs");
 [font size=40 color=0x00ffff]ãgó¢ãgó¢Ç∆KAGÇÃè–âÓ[resetfont][r]
 [r]
 [link target="*about_kirikiri"]ãgó¢ãgó¢[r_Ç∆]Ç∆[r_ÇÕ]ÇÕ[r_ÇÕ][graph storage="ExQuestion.png" alt="!?"][endlink][r]
+;[link target="*about_kirikiri"]ãgó¢ãgó¢[r_Ç∆]Ç∆[r_ÇÕ]ÇÕ[r_ÇÕ][graph storage="ExQuestion.png" alt="!?"][endlink][r]
 [link target="*about_kag"]KAGÇ∆ÇÕ[endlink][r]
 [r]
-[r]
+Ç†Ç¢Ç§[r_ÇÕ]ÇÕ[r_ÇÕ][graph storage="das2pt22.png" alt="Å\Å\"]Ç¶[r_ÇÕ][graph storage="ExQuestion.png" alt="!?"]Ç®[r]
 [r]
 [r]
 [r]

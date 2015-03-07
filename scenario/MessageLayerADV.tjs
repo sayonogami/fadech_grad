@@ -418,6 +418,8 @@ class MessageLayerADV extends MessageLayer {
 		if(vertical) {
 			in_x = set_cx(lineLayerBase - (lw>>1)), in_y = lineLayerPos;
 			dr_x = cx; dr_y = set_cy(0);
+			lw += rubySize + rubyOffset;
+			if(fontSize > lw) lw += (fontSize-lw);
 		} else {
 			in_x = lineLayerPos; in_y = 0;
 			dr_x = set_cx(0); dr_y = set_cy(lineLayerBase - lh);

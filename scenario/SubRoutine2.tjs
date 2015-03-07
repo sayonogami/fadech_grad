@@ -1,0 +1,408 @@
+/*-----------------------------------------------------------------------------
+/		Copyright (C) サークル煌明	All Rights Reserved.
+/			SubRoutine2 Ver.0.1X
+/ サブルーチン2
+/----------------------------------------------------------------------------*/
+@if(__SUBROUTINE2_DEFINED__==0)
+@set(__SUBROUTINE2_DEFINED__=1)
+
+/*-----------------------------------------------------------------------------
+/ @	未使用前景レイヤを必要最小限の大きさにする	Ver.0.13
+/		n : 対象前景レイヤ番号 (kag)
+/	メモリ節約用。指定した前景レイヤ n 番をいろいろ解放する
+/	基本は initLayer() との併用
+/----------------------------------------------------------------------------*/
+function nulifyLayer(n) {
+	var f = kag.fore.layers[n], b = kag.back.layers[n];
+	f.freeImage();
+	b.freeImage();
+	f.enabled = b.enabled = false;
+	f.visible = b.visible = false;
+//	dm('nulifyLayer('+n+')');
+}
+
+/*-----------------------------------------------------------------------------
+/ @	KAGレイヤ自動判別＆設定	Ver.0.23
+/		absolute, enabled
+/		face, type
+/		opacity, visible
+/		left, top, width, height	: 全部そのまんま
+/		targetLayer, underLayer		: 対象レイヤ、表、裏
+/
+/	initLayer(absolute,,,opacity,type,visible,,,,,targetLayer,underLayer,256);
+/	initLayer(absolute,,,opacity,,,,,,,targetLayer,underLayer,256);
+/----------------------------------------------------------------------------*/
+function initLayer(absolute, enabled, face, opacity, type, visible, left, top, width, height, foreLayer, backLayer, hitThreshold) {
+	with(foreLayer) {
+		var base = kag.fore.base;
+		var b = backLayer;
+		// 表と裏のレイヤの設定
+		var aS = autoSelect;
+		.absolute	= b.absolute= aS(absolute, 1000);
+		.enabled	= b.enabled	= aS(enabled, true);
+		.face		= b.face	= aS(face, dfAlpha);
+		.opacity	= b.opacity	= aS(opacity, 255);
+		.type		= b.type	= aS(type, ltAlpha);
+		.visible	= b.visible	= aS(visible, false);
+		.left		= b.left	= (int)aS(left, 0);
+		.top		= b.top		= (int)aS(top, 0);
+		.width		= b.width	= (int)aS(width, base.width);
+		.height		= b.height	= (int)aS(height, base.height);
+
+		.hitThreshold = b.hitThreshold = hitThreshold if hitThreshold!==void;
+		dm('+++initLayer+++ absolute='+.absolute+', enabled='+.enabled+', face='+.face+', opacity='+.opacity+', type='+.type+', visible='+.visible+', size='+.left+','+.top+','+.width+','+.height+', hitThreshold='+.hitThreshold);
+	}
+}
+
+/*-----------------------------------------------------------------------------
+/ @	対象レイヤ自動分割	Ver.0.31
+/		fores	: 判別、分割したレイヤへの参照を入れる「配列」
+/		backs	: 判別、分割したレイヤへの参照を入れる「配列」
+/		target	: 判別対象の文字列 ("0,1,2,…,base,message"など)
+/		page	: 表か？裏か？
+/	複数レイヤを一括して判別＆分割するためのもの。通常は fores に KAG表レイヤ 、
+/	backs に KAG裏レイヤ への参照が入る。page を "back" にすると逆になる
+/	fores, backs は「配列」でなければいけない
+/	メッセージレイヤの指定に対応？ MainWindow から取ってきただけ
+/	KAGレイヤでないレイヤはすべて fores に格納される
+/----------------------------------------------------------------------------*/
+function splitLayer(fores = [], backs = [], strings, page="fore") {
+	var targets = [] = strings.split(",", ,true);
+	var apage = page!=='fore' ? 'fore' : 'back';	// 指定ページ裏表逆
+
+	for(var i=0;i<targets.count;i++) {
+		var t = targets[i];
+		if(t==='base') {
+		// "base" なら背景レイヤ
+			fores.add(kag[page].base);
+			backs.add(kag[apage].base);
+		} else if(t[0]==='m') {
+		// "message" ならカレント
+		// "messages0", "messages1"... なら該当するメッセージレイヤ
+			if(t==='message') {
+				fores.add(kag[page].messages[kag.currentNum]);
+				backs.add(kag[apage].messages[kag.currentNum]);
+			} else {
+				fores.add(kag[page].messages[+t.substr(7)]);
+				backs.add(kag[apage].messages[+t.substr(7)]);
+			}
+		} else if((/^[0-9]*$/.test(t)) && t<=kag.numCharacterLayers) {
+		// 0, 1... など数字だけなら該当する前景レイヤ
+			fores.add(kag[page].layers[t]);
+			backs.add(kag[apage].layers[t]);
+		} else {
+		// それ以外はレイヤへの参照を表す文字列だと見なして処理
+			fores.add(Scripts.eval(t));
+			backs.add(void);
+		}
+	}
+}
+
+/*-----------------------------------------------------------------------------
+/ @	Layer.type 自動判別	Ver.0.10
+/		targetLayer のレイヤタイプを type のタイプに合わせる
+/----------------------------------------------------------------------------*/
+function switchLayerType(targetLayer,type) {
+	with(targetLayer) {
+		switch(type) {
+			case "ltOpaque"			: .type=ltOpaque;			break;
+			case "ltAlpha"			: .type=ltAlpha;			break;
+			case "ltAddAlpha"		: .type=ltAddAlpha;			break;
+			case "ltAdditive"		: .type=ltAdditive;			break;
+			case "ltSubtractive"	: .type=ltSubtractive;		break;
+			case "ltMultiplicative"	: .type=ltMultiplicative;	break;
+			case "ltDodge"			: .type=ltDodge;			break;
+			case "ltDarken"			: .type=ltDarken;			break;
+			case "ltLighten"		: .type=ltLighten;			break;
+			case "ltScreen"			: .type=ltScreen;			break;
+			case "ltPsNormal"		: .type=ltPsNormal;			break;
+			case "ltPsAdditive"		: .type=ltPsAdditive;		break;
+			case "ltPsSubtractive"	: .type=ltPsSubtractive;	break;
+			case "ltPsMultiplicative":.type=ltPsMultiplicative; break;
+			case "ltPsScreen"		: .type=ltPsScreen;			break;
+			case "ltPsOverlay"		: .type=ltPsOverlay;		break;
+			case "ltPsHardLight"	: .type=ltPsHardLight;		break;
+			case "ltPsSoftLight"	: .type=ltPsSoftLight;		break;
+			case "ltPsColorDodge"	: .type=ltPsColorDodge;		break;
+			case "ltPsColorDodge5"	: .type=ltPsColorDodge5;	break;
+			case "ltPsColorBurn"	: .type=ltPsColorBurn;		break;
+			case "ltPsLighten"		: .type=ltPsLighten;		break;
+			case "ltPsDarken"		: .type=ltPsDarken;			break;
+			case "ltPsDifference"	: .type=ltPsDifference;		break;
+			case "ltPsDifference5"	: .type=ltPsDifference5;	break;
+			case "ltPsExclusion"	: .type=ltPsExclusion;		break;
+			default					: .type=ltAlpha;
+		}
+	}
+	return;
+}
+
+/*-----------------------------------------------------------------------------
+/ @	表示画面の位置ずらし	Ver.0.40
+/		指定したレイヤをずらす。base レイヤは copyRect でずらした
+/		page	: fore or back (def.fore)
+/		target	: ずらされるレイヤ (def.base,0,1,2,3,4)
+/		left	: ずらされる横
+/		top	: ずらされる縦
+/	裏は動いていないとか背景が妙になるとか正直不都合有りまくりだけど、
+/	今のところ WearFilmPlugin しか使っていないからまあいっか。
+/----------------------------------------------------------------------------*/
+function changeLayerPos(page="fore", target="base,0,1,2,3,4", left, top) {
+	var layer = [];
+	var b = kag[page].base;
+	splitLayer(layer,[],target,page);
+
+	for(var i=0; i<=layer.count; i++) {
+		if(layer[i]!==void && layer[i].visible) {
+		// プライマリレイヤはsetPosで移動できない
+			if(b==layer[i]) {
+				b.copyRect(b.left+left, b.top+top, b, 0, 0, b.width, b.height);
+			} else {
+				layer[i].setPos(layer[i].left+left, layer[i].top+top);
+			}
+		}
+	}
+	b.setPos(0,0);
+	return;	// 戻る
+}
+
+/*-----------------------------------------------------------------------------
+/ @	表示画面の重ね合わせ	Ver.0.52
+/		指定したレイヤをすべてひとつのレイヤにコピー ≒ piledCopy
+/		全画面を覆っているレイヤに結合させることを想定
+/		layer	: 結合する対象のレイヤ (def.base)
+/			　　前景レイヤへのコピーは表示が変になる可能性もある
+/		page	: fore or back (def.fore)
+/		target	: 結合される前景レイヤ (def.0,1,2,3,4)
+/		leave	: コピーしたレイヤを非表示にするか？ (def.true)
+/----------------------------------------------------------------------------*/
+function copyingScreen(layer="base", page="fore", target="0,1,2,3,4", leave="true") {
+	var base = kag.fore.base;
+
+	var receiver = layer==='base' ? kag[page].base : kag[page].layers[layer];
+	var layers = [];
+	splitLayer(layers,[],target,page);
+
+	for(var i=0;i<layers.count;i++) {
+		var l = layers[i];
+		if(l.visible)
+			receiver.operateRect(l.left,l.top,l,0,0,l.width,l.height,,l.opacity);
+		l.freeImage() if(leave && layers[i]!==base);
+	}
+	receiver.visible = true;
+	return;
+}
+
+/*-----------------------------------------------------------------------------
+/ @	表示画面のガンマ補正	Ver.0.30
+/		指定したレイヤのガンマ値をまとめて変える。無駄といえば無駄
+/		page	: fore or back
+/		target	: 前景レイヤ
+/		gamma	: ガンマ値
+/----------------------------------------------------------------------------*/
+function changeLayerGamma(page="fore", target="base,0,1,2,3,4", gamma) {
+	var layers = [], g = [];
+	splitLayer(layers,[],target,page);
+	g = gamma.split(",", ,true);		// ガンマ値を分解して代入
+	var base = kag.fore.base;
+
+	for(var i=0; i<=5; i++) {
+		if(layers[i].visible)
+			layers[i].adjustGamma(g[0],g[1],g[2],g[3],g[4],g[5],g[6],g[7],g[8]);
+	}
+	return;	// 戻る
+}
+
+
+/*-----------------------------------------------------------------------------
+/ @	影付き線の描画
+/		layer	: 対象レイヤ
+/				: 縁の左上位置、幅、高さ、明色、暗色、透明度
+/----------------------------------------------------------------------------*/
+function drawShadowLine(layer, l, t, w, h, lh=0xFF000000, ll=0xFFFFFFFF) {
+	with(layer) {
+		if(w>h) {
+			.fillRect(l, t, w, (h>>1), lh);			// 上
+			.fillRect(l, t+(h>>1), w, (h>>1), ll);	// 下
+		}else if(h>w) {
+			.fillRect(l, t, (w>>1), h, lh);			// 上
+			.fillRect(l+(w>>1), t, (w>>1), h, ll);	// 下
+		}
+	}
+}
+/*-----------------------------------------------------------------------------
+/ @	縁の描画
+/		layer	: 対象レイヤ
+/				: 縁の左上位置、幅、高さ、色
+/----------------------------------------------------------------------------*/
+function drawEdge(layer, l, t, w, h, color=0xFF000000) {
+	layer.fillRect(l, t, w, 1, color);		// 上
+	layer.fillRect(l, t+h-1, w, 1, color);	// 下
+	layer.fillRect(l, t, 1, h, color);	// 左
+	layer.fillRect(l+w-1, t, 1, h, color);	// 右
+}
+
+/*-----------------------------------------------------------------------------
+/ @	縁の描画	角も滑らかばーじょん
+/		layer	: 対象レイヤ
+/				: 縁の左上位置、幅、高さ、縁取りの幅、明色、暗色、透明度
+/----------------------------------------------------------------------------*/
+function drawShadowEdge(layer, l, t, w, h, lw=1, lh=0xFF000000, ll=0xFFFFFFFF) {
+	for(var i=0;i<lw;i++) {
+		layer.fillRect(l, t, w, 1, lh);		// 上
+		layer.fillRect(l, t+h-1, w, 1, ll);	// 下
+		layer.fillRect(l, t+1, 1, h-2, lh);	// 左
+		layer.fillRect(l+w-1, t, 1, h, ll);	// 右
+		l++; t++; w-=2;	h-=2;
+	}
+}
+
+/*-----------------------------------------------------------------------------
+/ @	縁の描画	角も滑らか カラーレクトばーじょん
+/		layer	: 対象レイヤ
+/				: 縁の左上位置、幅、高さ、縁取りの幅、明色、暗色、透明度
+/----------------------------------------------------------------------------*/
+function rectShadowEdge(layer, l, t, w, h, lw=1, lh=0x000000, ll=0xFFFFFF, o=128) {
+	for(var i=0;i<lw;i++) {
+		layer.colorRect(l, t, w-1, 1, lh, o);		// 上
+		layer.colorRect(l, t+h-1, w, 1, ll, o);		// 下
+		layer.colorRect(l, t+1, 1, h-2, lh, o);		// 左
+		layer.colorRect(l+w-1, t, 1, h-2, ll, o);	// 右
+		l++; t++; w-=2;	h-=2;
+	}
+}
+
+/*-----------------------------------------------------------------------------
+/ @	縁の丸い影付き矩形の描画
+/		layer	: 対象レイヤ
+colorRoundRect( [x, y, w, h, r], col, opa )		(角が丸い矩形)
+/				: 縁の左上位置、幅、高さ、縁取りの幅、明色、暗色、透明度
+/----------------------------------------------------------------------------*/
+function drawShadowRound(layer, l, t, w, h, r, col=0xFF0000, opa=255, lw=1, lh=0x000000, ll=0xFFFFFF) {
+//	for(var i=0;i<lw;i++) {
+		layer.colorRect(l, t, w-1, 1, lh, o);		// 上
+		layer.colorRect(l, t+h-1, w, 1, ll, o);		// 下
+		layer.colorRect(l, t+1, 1, h-2, lh, o);		// 左
+		layer.colorRect(l+w-1, t, 1, h-2, ll, o);	// 右
+		l++; t++; w-=2;	h-=2;
+
+		layer.drawRoundRect(x, y, w, h, r, lh, opa);
+		layer.drawRoundRect(x-lw, y-lw, w-lw, h-lw, r, ll, opa);
+		layer.colorRoundRect(x-lw, y-lw, w-lw*2, h-lw*2, r, col, opa);
+//	}
+}
+
+/*-----------------------------------------------------------------------------
+/ @	長方形同士のヒットテスト
+/ それぞれ [ 左上left,左上top,右下left,右下top ] の配列
+/ 直線同士のヒットテストの二倍近く早かった
+/ 配列を * で展開して渡すコスト > 配列を式中で弄るコスト  のせいで、
+/ squareCollision2 のが速度は速かった。
+/ 配列でないのを直接渡すなら squareCollision。
+/----------------------------------------------------------------------------*/
+function squareCollision(x1,y1,x2,y2,x3,y3,x4,y4) {
+	return !( y2 < y3 || y4 < y1 || x2 < x3 || x4 < x1 );
+}
+
+function squareCollision2(s1, s2) {
+	return !( s1[3] < s2[1] || s2[3] < s1[1] || s1[2] < s2[0] || s2[2] < s1[0] );
+}
+
+
+/*-----------------------------------------------------------------------------
+/ @	直線同士のヒットテスト
+/
+/ 速度的には linerCollision == linerCollision1b > linerCollision1a
+/ 配列でやろうとすると大分遅くなるみたいだな
+/ それでも 2 よりは二倍以上早かった
+/ 1a, 1b は [ 開始x, 開始y, 終端x, 終端y ] の配列
+/----------------------------------------------------------------------------*/
+function linerCollision(x1,y1,x2,y2,x3,y3,x4,y4) {
+	var xx31 = x3-x1, xx41 = x4-x1, 
+		yy31 = y3-y1, yy41 = y4-y1;
+
+	var D = xx31*yy41 - yy31*xx41;
+	if(D==0) {
+		//	D = 0 の時には、点が線分の上かどうかを判定する。
+		var xx32 = x3-x2, yy32 = y3-y2;
+//	dm(xx32);
+		return ( xx31*xx41+yy31*yy41 <= 0
+				|| xx31*xx32+yy31*yy32 <= 0
+				|| xx32*(x4-x2)+yy32*(y4-y2) <= 0);
+	} else {
+		var yy21 = y2-y1, xx21 = x2-x1;
+		var S = yy41*xx21 - xx41*yy21, 
+			T = xx31*yy21 - yy31*xx21;
+		if(D>0)
+			return !( S<0 || T<0 || (S+T)/D < 1 );
+		else
+			return !( S>0 || T>0 || (S+T)/D < 1 );
+	}
+}
+
+function linerCollision1a(l1, l2) {
+	var xx21 = l2[2]-l1[0], yy21 = l2[3]-l1[1], xx1 = l2[0]-l1[0], yy1 = l2[1]-l1[1];
+	//	分母を先に計算。計算量を減らすため、分子は後で行う。
+	var D = xx1*yy21-yy1*xx21;
+
+	if(D==0) {
+	//	D = 0 の時には、点が線分の上かどうかを判定する。
+		return ( xx1*xx21+yy1*yy21 <= 0
+		    || (l2[0]-l1[2])*(l2[2]-l1[2])+(l2[1]-l1[3])*(l2[3]-l1[3]) <= 0
+	    	|| (l1[0]-l2[0])*(l1[2]-l2[0])+(l1[1]-l2[1])*(l1[3]-l2[1]) <= 0 );
+	} else {
+		var xx = l1[2]-l1[0], yy = l1[3]-l1[1];
+		var S = yy21*xx - xx21*yy;
+		var T = xx1*yy - yy1*xx;
+		return ( (D > 0)?(S <= 0 && T <= 0):(S >= 0 && T >= 0) && (S+T)/D >= 1 );
+	}
+}
+
+function linerCollision1b(x1,y1,x2,y2,x3,y3,x4,y4){
+	var S,T,D;	//	一時変数を宣言
+
+	//	分母を先に計算。計算量を減らすため、分子は後で行う。
+	D = (x3-x1) * (y4-y1) - (y3-y1) * (x4-x1);
+	
+	//	D の符号に応じて分岐
+	if(D < 0){
+		S = (y4-y1)*(x2-x1) - (x4-x1)*(y2-y1);
+		T = (x3-x1)*(y2-y1) - (y3-y1)*(x2-x1);
+		
+		return (S <= 0 && T <= 0 && (S+T)/D >= 1);
+	}
+	else if(D > 0){
+		S = (y4-y1)*(x2-x1) - (x4-x1)*(y2-y1);
+		T = (x3-x1)*(y2-y1) - (y3-y1)*(x2-x1);
+		
+		return (S >= 0 && T >= 0 && (S+T)/D >= 1);
+	}
+	
+	//	D = 0 の時には、点が線分の上かどうかを判定する。
+	return (x3-x1)*(x4-x1)+(y3-y1)*(y4-y1) <= 0
+	    || (x3-x2)*(x4-x2)+(y3-y2)*(y4-y2) <= 0
+	    || (x1-x3)*(x2-x3)+(y1-y3)*(y2-y3) <= 0;
+}
+
+/*-----------------------------------------------------------------------------
+/ @	直線同士のヒットテスト2
+/ Luna からTJS用に改造
+/ それぞれ [ 開始x, 開始y, 終端x, 終端y ] の配列
+/----------------------------------------------------------------------------*/
+function linerCollision2(l1, l2) {
+  // l1 が l2 をまたいでいるか
+  var ret1 = ( side(l2[0], l2[1], l1) * side(l2[2], l2[3], l1) );
+  // l2 が l1 をまたいでいるか
+  var ret2 = ( side(l1[0], l1[1], l2) * side(l1[2], l1[3], l2) );
+
+  return ((ret1<=0) && (ret2<=0) );
+} 
+/*----------------------------------------------------------
+/ @/ 点(x,y)が直線分 l のどちら側にあるか調べる
+// 直線分 line の右側 : + , 直線上 : 0, 左側 : -
+/---------------------------------------------------------*/
+function side(x, y, line ) {
+  return ( (x-line[0])*(y-line[3]) - (y-line[1])*(x-line[2]) );
+}
+
+@endif
