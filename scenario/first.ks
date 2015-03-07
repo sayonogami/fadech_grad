@@ -60,8 +60,9 @@ Scripts.execStorage("MessageLayerADV.tjs");
 ;* ADD
 ;@deffont edge=false shadow=false edgecolor=0xff0000 edgeextent=2 edgeemphasis=1024
 ;@position vertical=true
+@deffont edge shadow=false edgecolor=0xff0000 edgeextent=2 edgeemphasis=1024
 
-@deffont edge=false shadow shadowcolor=0xff0000 shadowoffsetx=4 shadowoffsety=4
+;@deffont edge=false shadow shadowcolor=0xff0000 shadowoffsetx=4 shadowoffsety=4
 @resetfont
 
 
@@ -77,7 +78,7 @@ Scripts.execStorage("MessageLayerADV.tjs");
 @style align=center
 [font size=40 color=0x00ffff]ãgó¢ãgó¢Ç∆KAGÇÃè–âÓ[resetfont][r]
 [r]
-[link target="*about_kirikiri"]ãgó¢ãgó¢Ç∆ÇÕ[graph storage="ExQuestion.png" alt="!?"][endlink][r]
+[link target="*about_kirikiri"]ãgó¢ãgó¢[r_Ç∆]Ç∆[r_ÇÕ]ÇÕ[r_ÇÕ][graph storage="ExQuestion.png" alt="!?"][endlink][r]
 [link target="*about_kag"]KAGÇ∆ÇÕ[endlink][r]
 [r]
 [r]

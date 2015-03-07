@@ -403,7 +403,6 @@ class MessageLayerADV extends MessageLayer {
 		// テンポラリのレイヤを用意
 		var lay = window.temporaryLayer;
 		lay.fillRect(0, 0, lay.width, lay.height, 0x00000000);
-
 		lay.loadImages(storage, key); // 画像読み込み
 		var lw = lay.imageWidth, lh = lay.imageHeight;
 		lay.setSizeToImageSize();
@@ -429,8 +428,15 @@ class MessageLayerADV extends MessageLayer {
 		cl.initChLayer(in_x, in_y, lw, lh);
 		var color = get_chColor();
 
-		cl.drawGraph(dr_x, dr_y, lay, color, ischar, edge, shadow, edgeExtent, e_s_color, edgeEmphasis, shadowOffsetX, shadowOffsetY);
-
+		if(edge) {
+			cl.expandLayer(edgeExtent, edgeExtent);
+			cl.drawGraph(dr_x, dr_y, lay, color, ischar, true, false, edgeExtent, edgeColor, edgeEmphasis, 0, 0);
+		} else if(shadow) {
+			cl.expandLayer(shadowOffsetX, shadowOffsetY);
+			cl.drawGraph(dr_x, dr_y, lay, color, ischar, false, true, 0, shadowColor, 255, shadowOffsetX, shadowOffsetY);
+		} else {
+			cl.drawGraph(dr_x, dr_y, lay, color, ischar, false, false);
+		}
 
 		// 描画おわり
 		lastDrawnCh="";

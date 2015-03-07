@@ -494,12 +494,16 @@ class FadeChLayer extends FadeLayer {
 		ch_width = lay.imageWidth;	// 親文字の幅
 		ch_height = lay.imageHeight;
 
-		if(edge) {
-			expandLayer(ee, ee);
-		} else if(shadow) {
-			expandLayer(sX, sY);
-		}
+		if(ruby!="") { calcRubyPos(cx, cy); }	// ルビ計算
+
 		cx += expandX; cy += expandY;
+
+		// ルビ
+		if(ruby!="") {
+			font.height=rubysize; font.bold=rubybold; font.face=rubyface;
+			drawText_adv(rx, ry, ruby, color, 255, ml.antialiased, eEm, esC, ee, sX, sY);
+			font.face=fontface; font.bold=fontbold; font.height=fontsize;
+		}
 
 		if(ischar && (edge || shadow)) {
 			drawGraphShadow(cx, cy, lay, color, ischar, edge, shadow, ee, esC, eEm, sX, sY);
