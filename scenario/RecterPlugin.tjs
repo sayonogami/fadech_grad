@@ -1,0 +1,480 @@
+/*------------------------------------------------------------------------------
+/		Copyright (C) サークル煌明	All Rights Reserved.
+/			RecterPlugin Ver.0.6X
+/ @dependsOn util_graph.dll
+/ 
+/ 画面塗りつぶし関係を KAG で簡便に扱うためのプラグイン : 中途トランジション実装版
+/ 
+/ 「吉里吉里２ ごった煮プラグイン」 より util_graph.dll を使用
+/
+/ flush が偽(default)ならトランジションをはさむと表に出てきて、消すまで出続けます
+/ 
+/ flush が真なら表レイヤに塗られるだけなので opacity 変化でフラッシュ効果
+/ 	留意 - flush 時はトランジションをしても消えます
+/ flush 機能は FadePlugin(未公開) を使って管理することを前提に作ったので、通常は
+/ 使わない方がいいと思います
+/
+/
+/ left, top, width, height は「そのレイヤ」の位置と大きさを表し、
+/ x, y, w, h は「そのレイヤ上での」位置、大きさを表す
+/ つまり left, top を変更した場合は、画面上での描画位置は left+x, top+y, になる
+/ 通常は x, y, w, h だけを指定してください
+/ 
+
+/ continue
+/ 描画イメージは変更するが、継続してレイヤを利用する
+
+colorRect( [x, y, w, h]*, col, opa )		(矩形)
+gradateRect( [x, y, w, h, type, dir]*, [cols], opa )	(矩形グラデ)
+	// recttype				num	phase
+	// tpgtGradientT2B	1	上から下
+	// tpgtGradientL2R	2	左から右
+	// tpgtGradientSpec	3	指定方向	dirで角度rad指定
+	// tpgtGradientQuad	4	四隅
+colorCircle( [x, y, r]*, col, opa )		(円)
+gradateCircle( [x, y, r]*, [cols], opa )	(円グラデ)
+colorEllipse( [x, y, ra, rb]*, col, opa )	(楕円)
+gradateEllipse( [x, y, ra, rb]*, [cols], opa )	(楕円グラデ)
+colorTriangle( [x1, y1, x2, y2, x3, y3]*, col, opa )	(三角形)
+colorRoundRect( [x, y, w, h, r]*, col, opa )		(角が丸い矩形)
+
+/-----------------------------------------------------------------------------*/
+@if(__RECTERPLUGIN_OBJECT_DEFINED__==0)
+@set(__RECTERPLUGIN_OBJECT_DEFINED__=1)
+try { Plugins.link("util_graph.dll");
+	dm("RecterPlugin : util_graph.dllを読み込みました");
+ }
+catch(e) { dm("RecterPlugin : util_graph.dllが見つかりませんでした"); }
+
+Scripts.execStorage("KAGPluginLX.tjs");
+// Scripts.execStorage("_FadePlugin.tjs");
+
+class RecterHalfWayTransLayer extends Layer {
+	var propersnum;	// props[num] の num
+	var transPhase;	// 0:実行していない, 1:実行した
+	var dest;		// 中途トランジション先レイヤ (透明 or elm.trans)
+	var src;		// 中途トランジション元レイヤ (最終的に KAGレイヤ にコピー)
+
+	var rp_obj;
+	var r_layer;
+
+	function RecterHalfWayTransLayer(window, recterPlugin_object) {
+		rp_obj = recterPlugin_object;
+		r_layer = rp_obj.props.flush ? rp_obj.transLayer : rp_obj.showLayer;
+
+		super.Layer(window, window.fore.base);
+
+		dest = new RecterTransChildLayer(window, this);
+		src = new RecterTransChildLayer(window, this);
+		transPhase = 0;
+
+		setTrans();
+	}
+
+	function finalize() {
+		super.finalize();
+	}
+
+	function setTrans() {
+		setPos(0, 0, r_layer.width, r_layer.height);
+		visible = true;	// 親が偽では駄目らしいのよね
+
+		with(rp_obj.props) {
+			with(dest) {
+				.assignImages(r_layer);
+				.setSizeToImageSize();
+				.opacity = 0;
+				.visible = true;
+			}
+
+			if(.transl !== void) {
+			// コピーするレイヤの大きさは、当然同じじゃなきゃいけないよ
+				src.assignImages(.transl);
+				src.setSizeToImageSize();
+			} else {
+				src.setPos(0, 0, dest.width, dest.height);
+				src.fillRect(0, 0, src.width, src.height, 0x00000000);
+			}
+
+		// トランジション起動 ==> 第二回目のトランジション開始までに間があるため
+		// @flushin などで visible が真かつ表画面に現れているときに
+		// 一瞬中途トランジション未適用の画面が現れてしまうのを防ぐ(はず)
+		// 一端画面を消すため、 ContinuousHandler 二サイクル分表示が遅れてしまう
+		// !flush のときは裏を消すことになるから画面に変化は現れない
+			r_layer.fillRect(0, 0, r_layer.width, r_layer.height, rp_obj.neutralColor);
+			dest.beginTransition( .method2, true, src, 
+				%[ vague:.vague, time:1000, rule:.rule, callback:this.callback ]
+			);
+		}
+	}
+
+	function callback() {
+		var rp = rp_obj.props;
+		if(rp===void || !rp isvalid) {
+			return 0;
+		} else {
+			if(transPhase == 0) {
+			dm("rector transPhase == 0");
+				transPhase++;
+				return rp.rate;
+			} else if(transPhase == 1) {
+			dm("rector transPhase == 1");
+				transPhase++;
+				if(isvalid r_layer) {
+					dest.opacity = 255;
+					// トランジション実行中の画面をコピーしようと operateRect 等を
+					// 使用してもうまく画面が写せなかった。しょうがないから、
+					// テンポラリに親を作ってまるごと piledCopy でコピーすることにする
+					r_layer.piledCopy( 0, 0, this, 0, 0, width, height );
+
+				//	// ロード時は、直ぐ表にコピーする(栞を挟む前に表示されていると仮定)
+					if(kag.skipMode >=2)
+						rp.leadfore = true;
+
+					if(rp.leadfore)
+						rp_obj.transLayer.assignImages(rp_obj.showLayer);
+					rp.leadfore = false;
+
+					return 1000;
+				}
+			}
+		}
+	}
+}
+
+class RecterTransChildLayer extends Layer {
+	function RecterTransChildLayer(window, parent) {
+		super.Layer(window, parent);
+		face = dfAlpha;
+		type = ltAlpha;
+		holdAlpha = true;
+
+		absolute = 99;
+		opacity = 0;
+		visible = false;
+	}
+
+	function finalize() {
+		super.finalize(...);
+	}
+
+	function onTransitionCompleted(dest, src) {
+		super.onTransitionCompleted(...);
+		dm("rector half way trans finished");
+		parent.rp_obj.endHalfwayTrans();
+	}
+}
+
+
+class RecterPlugin extends KAGPluginLX {
+	// S&L用の情報はすべて辞書配列として propsに保存しているので、
+	// onRestore 時にはこれを復旧するだけでOK
+	var props = %[];
+
+	var halfWayTransDoing = false;
+	var hwtLayer;
+
+	function RecterPlugin(window, plgName) {
+		super.KAGPluginLX(...);
+	//	neutralColor = 0x00FFFFFF;
+	}
+
+	function finalize() {
+		stop();
+		super.finalize(...);
+	}
+
+	function set(elm) {
+		var aS = autoSelect;
+		var e = elm;
+		var p_color = elm.color;
+
+		if(props===void) {
+			props = %[];
+			(Dictionary.assign incontextof props)(elm);
+		}
+		e.absolute = aS(e.absolute, absolute);
+		e.visible = true;
+		e.color = void;
+		initLayer(e);
+
+		props.color = unfoldColor(p_color);
+
+		with(props) {
+			var w = transLayer.width;
+			var h = transLayer.height;
+			// 中途トランジション完了時に表レイヤに結果をコピーするか？
+			.leadfore = false if .leadfore===void;
+
+			.flush = aS(e.flush, false);
+
+			.method	= aS(e.method, 'Rect');
+			.ropa = aS(e.ropa, 255);	// 共通 rectOpacity
+			// 単純塗りつぶしなら false , グラデなら true
+			var mes = (typeof .color === "Object") ? true : false;
+
+			if(e.pos!==void && e.conductor!==void) {
+			// ロード時の動作
+				.pos = e.pos;
+				.conductor = e.conductor;
+			} else if(.method==='Rect') {
+			// 矩形(グラデーション)塗りつぶし
+				.conductor = mes ? 'gradateRect' : 'colorRect';
+				.pos = [ aS(e.x,0), aS(e.y,0), aS(e.w,w), aS(e.h,h) ];
+				if(mes)
+					{ .pos.add( aS(e.recttype, 2) ); .pos.add( aS(e.dir, 0) ); }
+			} else if(.method==='Circle') {
+			// 円(グラデーション)塗りつぶし
+				.conductor = mes ? 'gradateCircle' : 'colorCircle';
+				.pos = [ aS(e.x, w\2), aS(e.y, h\2), aS(e.r, 100) ];
+			} else if(.method==='Ellipse') {
+			// 楕円(グラデーション)塗りつぶし
+				.conductor = mes ? 'gradateEllipse' : 'colorEllipse';
+				.pos = [ aS(e.x,w\2), aS(e.y,h\2), aS(e.ra,100), aS(e.rb,200) ];
+			} else if(.method==='Triangle') {
+			// 三角形塗りつぶし
+				if(!mes) { .conductor = 'colorTriangle'; }
+				else { stop(); return; }
+				.pos = [ aS(e.x1,w\2), aS(e.y1,h\2),
+						 aS(e.x2,w\2), aS(e.y2,h\2),
+						 aS(e.x3,w\2), aS(e.y3,h\2)  ];
+			} else if(.method==='RoundRect') {
+			// 角が丸い矩形塗りつぶし
+				if(!mes) { .conductor = 'colorRoundRect'; }
+				else { stop(); return; }
+				.pos = [ aS(e.x,0), aS(e.y,0), 
+						 aS(e.w,w), aS(e.h,h), aS(e.r,10) ];
+			} else {
+				stop(); return;
+			}
+
+			// 描画する
+			if(.flush) {	// flushモード
+				onrestore = true;	// 表に描画する
+				tostop = true;		// トランジションを挟んだら消える
+			}
+
+			if(doing && elm.continue) {
+				showLayer <-> transLayer;
+			}
+			showLayer[.conductor]( .pos*, .color, .ropa );
+
+			super.set(...); // KAGPluginLX作法
+
+		// 中途トランジションモード処理
+			if(e.rule !== void) {
+				.rule = e.rule;
+				.method2 = aS(e.method2, 'universal');
+				if(e.trans !== void) {
+					var lt1 = [], lt2 = [];	// KAG レイヤの画像もコピーできます
+					splitLayer(lt1, lt2, e.trans, 'fore');
+					.transl = (e.transpage==="back" ? lt2[0] : lt1[0]);
+				}
+				.rate = aS((int)e.rate, 500);
+				.vague = aS(e.vague, 64);
+				setHalfwayTrans();
+			} else {
+				.leadfore = false;		// 読み込み完了♪
+			}
+		}
+	}
+
+	function unfoldColor(color) {
+	// 文字列として送られてきた、0xFFFFFF が連なった色指定を配列に展開する
+	// すでに数字、配列になっているものはそのまま返す(はず)
+		var res = color!==void	? color	: 0x000000;
+		if(typeof res==="String" && res.indexOf(",")!==-1) {
+			return res.split(",", ,true);
+		} else {
+			return res;
+		}
+	}
+
+	function stop() {
+	// 描画判定のないレイヤ情報の抹消、及びプラグインの実行中止を判定
+		if(doing) {
+			props = %[];	// リセット
+			super.stop(); // KAGPluginLX作法
+		}
+	}
+
+/*
+/ @ 中途トランジション
+*/
+	function setHalfwayTrans(num) {
+	// 中途トランジションモード
+		// 1, 2 の親レイヤ
+		hwtLayer = new RecterHalfWayTransLayer(window, this);
+		halfWayTransDoing = true;
+	}
+
+	function endHalfwayTrans(num) {
+		invalidate hwtLayer;
+		halfWayTransDoing = false;
+	}
+
+/*
+/ @ KAG
+*/
+	function onStore(f, elm) {
+		f[pluginName] = %[];
+		with(f[pluginName]) {
+			if(doing) {
+				storeProp(f, elm);
+				.props = %[]; (Dictionary.assign incontextof .props)(props);
+			} else {
+				.doing = false;
+			}
+		}
+	}
+
+	function onRestore(f, clear, elm) {
+		if(f[pluginName]===void) return;
+	//	super.onRestore(...);
+		with(f[pluginName]) {
+			if(.doing) {
+				reStoreProp(...);
+				(Dictionary.assign incontextof props)(f[pluginName]);
+				(Dictionary.assign incontextof props)(.props, false);
+				// 描画判定のあるものを描いて、表にも出してしまう
+				props.leadfore=true;
+				set(props);
+			} else {
+				stop();
+				// stop の返しの所為で適切に終了できないことがあったので
+				doing = false;
+			}
+		}
+	}
+
+	function onExchangeForeBack() {
+		if(doing) {
+			props.leadfore = true if(halfWayTransDoing);
+		}
+		super.onExchangeForeBack();
+	}
+
+function splitLayer(fores = [], backs = [], strings, page="fore") {
+	var targets = [] = strings.split(",", ,true);
+	var apage = page!=='fore' ? 'fore' : 'back';	// 指定ページ裏表逆
+
+	for(var i=0;i<targets.count;i++) {
+		var t = targets[i];
+		if(t==='base') {
+		// "base" なら背景レイヤ
+			fores.add(kag[page].base);
+			backs.add(kag[apage].base);
+		} else if(t[0]==='m') {
+		// "message" ならカレント
+		// "messages0", "messages1"... なら該当するメッセージレイヤ
+			if(t==='message') {
+				fores.add(kag[page].messages[kag.currentNum]);
+				backs.add(kag[apage].messages[kag.currentNum]);
+			} else {
+				fores.add(kag[page].messages[+t.substr(7)]);
+				backs.add(kag[apage].messages[+t.substr(7)]);
+			}
+		} else if((/^[0-9]*$/.test(t)) && t<=kag.numCharacterLayers) {
+		// 0, 1... など数字だけなら該当する前景レイヤ
+			fores.add(kag[page].layers[t]);
+			backs.add(kag[apage].layers[t]);
+		} else {
+		// それ以外はレイヤへの参照を表す文字列だと見なして処理
+			fores.add(Scripts.eval(t));
+			backs.add(void);
+		}
+	}
+}
+
+
+}
+
+class RecterPluginManager {
+	var RecterPlugin_objects = [];
+	kag.addPlugin(RecterPlugin_objects[0] = new RecterPlugin(kag, "RecterPlugin1"));
+	kag.addPlugin(RecterPlugin_objects[1] = new RecterPlugin(kag, "RecterPlugin2"));
+	kag.addPlugin(RecterPlugin_objects[2] = new RecterPlugin(kag, "RecterPlugin3"));
+	kag.addPlugin(RecterPlugin_objects[3] = new RecterPlugin(kag, "RecterPlugin4"));
+	kag.addPlugin(RecterPlugin_objects[4] = new RecterPlugin(kag, "RecterPlugin5"));
+
+	var RecterPlugin_objects_Hide = [];
+	kag.addPlugin(RecterPlugin_objects_Hide[0] = new RecterPlugin(kag, "RecterPlugin1"));
+
+	function RecterPluginManager() {
+		RecterPlugin_objects[0].absolute = 175000;
+		RecterPlugin_objects[1].absolute = 178000;
+		RecterPlugin_objects[2].absolute = 185000;
+		RecterPlugin_objects[3].absolute = 190000;
+		RecterPlugin_objects[4].absolute = 196000;
+		// とりえあず、一番奥へ
+		RecterPlugin_objects_Hide[0].absolute = 1;
+	}
+
+	function finalize() {
+	}
+
+	function set(elm) {
+		RecterPlugin_objects[elm.layer].set(elm);
+	}
+
+	function finish(elm) {
+		RecterPlugin_objects[elm.layer].finish(elm);
+	}
+
+	function stop(elm) {
+		RecterPlugin_objects[elm.layer].stop(elm);
+	}
+
+	function getLayer(elm) {
+		return RecterPlugin_objects[elm.layer].showLayer;
+	}
+
+	// Hideは基本的に他プラグインから流用するだけのものだが、インタフェースは用意しとく
+	// とりあえず、末尾にHideを付けるということで。
+	function setHide(elm) {
+		elm.hide = true;
+		RecterPlugin_objects[elm.layer].set(elm);
+	}
+
+	function finishHide(elm) {
+		elm.hide = true;
+		RecterPlugin_objects[elm.layer].finish(elm);
+	}
+
+	function stopHide(elm) {
+		elm.hide = true;
+		RecterPlugin_objects[elm.layer].stop(elm);
+	}
+
+	function getLayerHide(elm) {
+		elm.hide = true;
+		return RecterPlugin_objects[elm.layer].showLayer;
+	}
+
+
+}
+global.RecterPluginManager_object = new RecterPluginManager();
+
+// @recter_on - 塗
+// トランジションを挟めば現れます。栞を挟む前にトランジションで現して下さい
+kag.tagHandlers.recter_on = function(elm = %[]) {
+	RecterPluginManager_object.set(elm);
+	return 0;
+} incontextof kag;
+
+// @recter_off - 消
+// トランジションを挟めば消えます。栞を挟む前にトランジションで消して下さい
+kag.tagHandlers.recter_off = function(elm = %[]) {
+	RecterPluginManager_object.finish(elm);
+	return 0;
+} incontextof kag;
+
+// @recter_erase - 強制的にレイヤを消します
+// 複数同時 flush 時の処理などに
+kag.tagHandlers.recter_erase = function(elm = %[]) {
+	RecterPluginManager_object.finish(elm);
+	RecterPluginManager_object.stop(elm);
+	return 0;
+} incontextof kag;
+
+@endif
