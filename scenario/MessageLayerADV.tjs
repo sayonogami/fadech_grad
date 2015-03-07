@@ -339,14 +339,14 @@ class MessageLayerADV extends MessageLayer {
 
 			if(edge) {
 				.expandLayer(edgeExtent, edgeExtent);
-				.drawText(dr_x, dr_y, ch, get_chColor(), 255, 
-					antialiased, edgeEmphasis, edgeColor, edgeExtent, 0, 0);
+				.drawText(dr_x, dr_y, ch, get_chColor(), 255, antialiased, 
+					edgeEmphasis, edgeColor, edgeExtent, 0, 0);
 			} else if(shadow) {
 		//		shadowOffsetX=-10, shadowOffsetY=-10;	// ƒeƒXƒg
 
 				.expandLayer(shadowOffsetX, shadowOffsetY);
-				.drawText(dr_x, dr_y, ch, get_chColor(), 255, 
-					antialiased, 255, shadowColor, 0, shadowOffsetX, shadowOffsetY);
+				.drawText(dr_x, dr_y, ch, get_chColor(), 255, antialiased, 
+					255, shadowColor, 0, shadowOffsetX, shadowOffsetY);
 			} else {
 				.drawText(dr_x, dr_y, ch, get_chColor(), 255, antialiased);
 			}

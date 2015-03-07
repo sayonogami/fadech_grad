@@ -451,6 +451,7 @@ class FadeChLayer extends FadeLayer {
 //		fillRect(x, y, 2, 2, 0xFFFF0000);
 //		drawEdge(this, 0, 0, width, height, 0xFFFFFFFF);
 //	drawEdge(this, x, y, 2, 2, 0xFFFFFFFF);
+		drawEdge(this, 0, 0, width, height, 0xFFFFFFFF);
 
 
 		show(left - slantMoveX, top - slantMoveY, , (skip?0:deffadetime) ) if !doing;
@@ -568,6 +569,7 @@ class FadeChLayer extends FadeLayer {
 
 		// 画像を文字色に塗ったものを作成
 		with(tmp) {
+			.fillRect(0, 0, .width, .height, 0x00000000);
 			.copyRect(cx, cy, lay, 0, 0, lay.width, lay.height);
 			.face = dfOpaque;
 			.holdAlpha = true;
@@ -619,24 +621,35 @@ class FadeChLayer extends FadeLayer {
 		show(left - slantMoveX, top - slantMoveY, , (skip?0:deffadetime) ) if !doing;
 	}
 
-	function OperateGradation(x, y, w, h) {
+	function OperateGradation(x, y, w, h, ee, sofx, sofy) {
 		// 初期Gradation x y w h
 		//   一文字の中でグラデーションが完結する
 		var g_x=0, g_y=0, g_w=w, g_h=h;
 
 		if(vertical) {
 			g_x = x; g_y = (hch?y:0);
-			g_w = (hch?ch_width:ch_height) + ml.rubySize + ml.rubyOffset; g_h = ch_height;
-//			g_w = (hch_ch?ch_width:ch_height) + ml.rubySize + ml.rubyOffset; g_h = ch_height;
+			g_w = (hch?ch_width:ch_height) + ml.rubySize + ml.rubyOffset; g_h = (hch?ch_height:ch_width);
 		} else {
-			// ry = y - ml.rubySize - ml.rubyOffset;	// y==ch_y
 			g_x = 0; g_y = y-ry;
 			g_w = w; g_h = height - ry;
+		}
+		// エッジ・影の分だけ領域を拡張
+		if(ee > 0) { // エッジ
+			g_w += ee;
+			g_h += ee;
+		} else if(sofx!=0 || sofy!=0) {
+			if(sofx>0) { g_w += sofx; } else { g_w -= sofx; }
+			if(sofy>0) { g_h += sofy; } else { g_h -= sofy; }
+			
+//			g_w += sofx>0?sofx:-sofx;
+//			g_h += sofy>0?sofy:-sofy;
 		}
 
 		ChGradRecter_object.set( %[
 			width:g_w, height:g_h, x:0, y:0, w:g_w, h:g_h
 		] );
+
+// dm(x, y, w, h, g_x, g_y, g_w, g_h);
 
 		this.operateRect(x, y, ChGradRecter_object.showLayer, g_x, g_y, w, h, omMultiplicative, 255);
 /*
@@ -652,28 +665,29 @@ class FadeChLayer extends FadeLayer {
 /*
 / @ 文字エフェクト
 */
-	function drawGradCh(x, y, text, col, opa=255, aa=true, sl=255, sc=0, sw=0, sofx=0, sofy=0) {
+	function drawGradCh(x, y, text, col, opa=255, aa=true, sl=255, sc=0, ee=0, sofx=0, sofy=0) {
 		var save_sc = sc;
-		sc = 0xFF000000;	// 影を黒にしてグラデ描画
+	//	sc = 0xFF000000;	// 影を黒にしてグラデ描画
 
-		super.drawText(x, y, text, col, opa, aa, sl, sc, sw, sofx, sofy);
+		super.drawText(...);
 
 		if(vertical && !hch_ch) {
-			OperateGradation(x-font.height, y, font.getTextHeight(text), font.getTextWidth(text));
+			OperateGradation(x-font.height, y, font.getTextHeight(text), font.getTextWidth(text), ee, sofx, sofy);
 		} else {
-			OperateGradation(x, y, font.getTextWidth(text), font.getTextHeight(text));
+			OperateGradation(x, y, font.getTextWidth(text), font.getTextHeight(text), ee, sofx, sofy);
 		}
 
 		// 枠が黒以外だった場合、枠を復活する。
 		if(save_sc !== 0x000000) {
 			// 現在までの描画結果を取っておく
-			setSize(this.width, this.height);
+			cl.setSize(this.width, this.height);
 			cl.fillRect(0, 0, cl.width, cl.height, 0x00000000);
 			cl.copyRect(0, 0, this, 0, 0, width, height);
+
 			sc = save_sc;	// 影を本来の色にして文字描画
 			col = 0x000000;	// 比較(明)合成で使うので文字色は黒
-			fillRect(0, 0, width, height, 0);
-			super.drawText(x, y, text, col, opa, aa, sl, sc, sw, sofx, sofy);
+			fillRect(0, 0, width, height, 0x00000000);
+			super.drawText(...);
 
 			// 比較(明)合成で、影とグラデを合成
 			this.operateRect(0, 0, cl, 0, 0, width, height, omLighten , 255); 
