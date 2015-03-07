@@ -1,0 +1,271 @@
+/*------------------------------------------------------------------------------
+/		Copyright (C) サークル煌明	All Rights Reserved.
+/			KAGPluginLX Ver.0.2X
+/ 
+/ トランジション対応 showLayer, transLayer 付きプラグイン
+/ / showLayer : 通常描画するレイヤ
+/ / transLayer : トランジション時に画像をバックアップするレイヤ
+/ 
+/ タグの例
+	kag.tagHandlers.plugin_on = function(elm = %[]) {
+		Plugin_object.set(elm);
+		return 0;
+	} incontextof kag;
+	
+	kag.tagHandlers.plugin_off = function(elm = %[]) {
+		Plugin_object.finish(elm);
+		return 0;
+	} incontextof kag;
+/ 
+/   [backlay][*plugin_on*][trans]  ／  [backlay][*plugin_off*][trans]
+/ の書き方で表示／非表示される
+
+elm.continue
+	描画イメージは変更するが、継続してレイヤを利用する
+	set内で条件判定して、
+		showLayer <-> transLayer
+	する必要がある
+/-----------------------------------------------------------------------------*/
+@if(__KAGPLUGINLX_DEFINED__==0)
+@set(__KAGPLUGINLX_DEFINED__=1)
+
+// レイヤ大きさ初期値
+
+class KAGPluginLXHolder extends KAGPlugin {
+	var l=0;
+	var t=0;
+	var w=0;
+	var h=0;
+
+	function KAGPluginLXHolder(window, plgName) {
+		super.KAGPlugin(...);
+		this.window	= window;
+
+		l=0;
+		t=0;
+		w=kag.fore.base.width;
+		h=kag.fore.base.height;
+	}
+
+	function finalize() {
+		super.finalize(...);
+	}
+
+	function set(tl, tt, tw, th) {
+		l=tl if(tl!==void);
+		t=tt if(tt!==void);
+		w=tw if(tw!==void);
+		h=th if(th!==void);
+	}
+
+	function onStore(f, elm) {
+		f["KAGPluginLXHolder"] = %[];
+		with(f["KAGPluginLXHolder"]) {
+			.kagPluginLX_l=l;
+			.kagPluginLX_t=t;
+			.kagPluginLX_w=w;
+			.kagPluginLX_h=h;
+		}
+	}
+
+	function onRestore(f, clear, elm) {
+		if(f["KAGPluginLXHolder"]===void) return;
+		with(f["KAGPluginLXHolder"]) {
+			l=.kagPluginLX_l;
+			t=.kagPluginLX_t;
+			w=.kagPluginLX_w;
+			h=.kagPluginLX_h;
+		}
+	}
+}
+
+if(typeof global.kPLXHolder == "undefined") {
+	global.kPLXHolder = new KAGPluginLXHolder();
+	kag.addPlugin(global.kPLXHolder);
+}
+
+class KAGPluginLX extends KAGPlugin {
+	var pluginName = ""; // onStore, onRestore時に使われるプロパティ名
+
+	// レイヤをクリアする際に使用する色。レイヤタイプの中性色を使用すること
+	var neutralColor = 0x00ffffff;
+
+	var window;
+	var base;
+
+	var transLayer, showLayer;
+	var absolute;
+
+	var doing = false;	// プラグインが実行中か
+	var tostop = false; // 終了フラグ
+
+	// set() してから最初のトランジションで"表示する"場合と
+	// その後の"表示し続ける"トランジションで動作を変えるフラグ
+	var tovisible = false;
+
+	var onTrans = false;// トランジション中か
+	var onrestore = false;	// レストア時のフラグ
+
+	function KAGPluginLX(window, plgName) {
+		super.KAGPlugin(...);
+		pluginName = plgName;
+
+		this.window	= window;
+		base = kag.fore.base;
+	}
+
+	function finalize() {
+		super.finalize(...);
+	}
+
+	function set() {
+	/* プラグイン動作開始時の初期設定 */
+	// set() の最後に呼ぶこと
+		tovisible = true;	// 初めて表示のフラグをオン
+		doing = true;		// プラグイン使用開始
+		if(onrestore) {
+			// onRestore から呼ばれた時
+			// トランジションを1回挟んだのと同じ状態にすることで、すぐ表示
+			tovisible = false;
+			showLayer <-> transLayer;
+			showLayer.assignImages(transLayer);
+			onrestore = false;	// Restore処理終了
+		}
+	}
+
+	function initLayer(elm) {
+	// レイヤの初期化。
+	// set() 内で呼ばれる
+		if(!doing || !elm.continue) {
+			transLayer = new Layer(window, kag.fore.base);
+			showLayer = new Layer(window, kag.back.base);
+		}
+
+		neutralColor = elm.neutralcolor if elm.neutralcolor!==void;
+
+		with(transLayer) {
+			var aS = autoSelect;
+			.absolute= showLayer.absolute= aS(elm.absolute, absolute);
+			.enabled = showLayer.enabled = aS(elm.enabled, true);
+			.opacity = showLayer.opacity = aS(elm.opacity, 255);
+			.visible = showLayer.visible = aS(elm.visible, false);
+			.face	 = showLayer.face	 = aS(elm.face, dfAlpha);
+			.type	 = showLayer.type	 = aS(elm.type, ltAlpha);
+			.hitThreshold = showLayer.hitThreshold = (int)aS(elm.hitThreshold, 256);
+
+			.left	 = showLayer.left	 = (int)aS(elm.left, kPLXHolder.l);
+			.top	 = showLayer.top	 = (int)aS(elm.top, kPLXHolder.t);
+			.width	 = showLayer.width	 = (int)aS(elm.width, kPLXHolder.w);
+			.height	 = showLayer.height	 = (int)aS(elm.height, kPLXHolder.h);
+
+			if(!doing || !elm.continue) {
+				showLayer.fillRect(0, 0, .width, .height, aS(elm.color, neutralColor) );
+			}
+			transLayer.fillRect(0, 0, .width, .height, neutralColor );
+		}
+	}
+
+	function onTimer() {
+	// トランジション対応 onTimer()
+		if(onTrans&&!tostop) { // 裏に画像をコピーする
+			transLayer.assignImages(showLayer);
+		}
+	}
+
+	function finish() {
+	/* プラグイン動作終了時の初期設定 */
+		if(doing) {
+			transLayer.fillRect(0,0,transLayer.width,transLayer.height,neutralColor);
+			tostop = true;
+		}
+	}
+
+	function stop() {
+	// プラグイン動作終了。全てのフラグを初期値に戻してレイヤを解放
+		if(doing) {
+			tostop = false;
+			doing = false;
+			tovisible = false;
+			onTrans = false;
+			onrestore = false;
+
+			invalidate transLayer;
+			invalidate showLayer;
+		}
+	}
+
+	function onRestore(f, clear, elm) {
+		super.onRestore(...);
+	}
+
+	function onCopyLayer(toback) {
+		// backlay タグ / forelay タグがすべてのレイヤに対して実行される時、
+		// あるいは layer=base chidlren=true exchange=false のトランジションの終了時に、
+		// 裏画面の内容を表画面にコピーする
+		// 必要が発生すると呼び出される
+		// toback = 表画面の内容を裏画面にコピーする時に true,
+		//          裏画面の内容を表画面にコピーするときに false
+		// layer=base children=true のトランジション終了時には toback = false で呼ばれる。
+		if(doing) {
+			onTrans = true;
+			if(toback) {
+				showLayer.assignImages(transLayer);
+			} else {
+				transLayer.assignImages(showLayer);
+			}
+		}
+	}
+
+	function onExchangeForeBack() {
+		// layer=base children=true のトランジションの終了時に呼ばれ、
+		// 表レイヤと裏レイヤの情報を交換する目的で呼ばれる
+		// この時点ですでにレイヤのツリー構造は入れ替わっているので、
+		// 通常、ここでは、ツリー構造の入れ替えを行うと情報が矛盾するもの
+		// ( レイヤの名前とか、レイヤへの参照とか ) を裏画面と面画面の間で入れ替える
+		// トランジション終了時の onCopyLayer はこのイベントより前に呼ばれるので
+		// 注意
+		if(doing) {
+			if(tostop) {
+				stop();
+			} else if(onTrans) {
+				onTrans = false;
+				if(!tovisible) transLayer <-> showLayer;
+			// 初回表示時が終わればフラグを下ろす
+				tovisible = false;
+			}
+		}
+	}
+
+	function storeProp(f, elm) {
+	// onStore内で呼ばれ、レイヤ関連設定を保存する
+		with(f[pluginName]) {
+			.hitThreshold = showLayer.hitThreshold;
+			.absolute= showLayer.absolute;
+			.enabled = showLayer.enabled;
+			.opacity = showLayer.opacity;
+			.visible = showLayer.visible;
+			.face	 = showLayer.face;
+			.type	 = showLayer.type;
+			.left	 = showLayer.left;
+			.top	 = showLayer.top;
+			.width	 = showLayer.width;
+			.height	 = showLayer.height;
+
+			.doing = true;
+		}
+	}
+
+	function reStoreProp(f, clear, elm) {
+	// onRestore内で呼ばれる
+		with(f[pluginName]) {
+			doing = true;	// プラグインが実行中か
+			onrestore = true; // レストア時のフラグ
+		}
+	}
+
+	function onSleep( tick ) {
+	}
+
+	function autoSelect(i, els) { return i!==void ? i : els; }
+}
+@endif

@@ -1,0 +1,237 @@
+/*------------------------------------------------------------------------------
+/		Copyright (C) サークル煌明	All Rights Reserved.
+/			SharedContinuousHandler Ver.0.7S
+/
+/ 110227 : sleep()的な機能を実装した
+/ 100702 : ちょいと動作を軽くした
+/ 100730 : またまたちっと軽くした
+/ 
+/ ----------------------------------------------------------
+/ 書式 … 任意の場所で
+/ ●呼び出し追加
+/ 	entry(object, interval, callBack, firstFire);
+/ 		object : 
+/ 			呼び出す関数を持ったオブジェクト(this でそのオブジェクト自身)
+/ 		interval : 
+/ 			Timer の interval と同じ、呼び出す間隔。デフォは 0(毎回)
+/ 		callBack : 
+/ 			呼び出したい関数名。デフォは "onTimer"
+/ 		firstFire : 
+/ 			entry した直後から関数を呼び出すか (wait, delay 用途では偽にするべし)
+/ 			偽だと最低intervalミリ秒後に最初の呼び出しがなされる
+/ ●呼び出し削除
+/ 	leave(object, callBack);
+/ 		object : 
+/			呼び出しを止めたい関数を持ったオブジェクト
+/ 		callBack : 
+/ 			呼び出しを止めたい関数名。デフォは"onTimer"
+/ ●一時停止
+/ 	sleep(tick);
+/ 		tick : 
+/ 			停止したいミリ秒数
+/ 			sleep中に再びsleep()が呼び出されたとき、それは無視される
+/ ●停止
+/ 	freeze()
+		defrost()関数が呼ばれるまで、当該 SharedContinuousHandler からの呼び出しをすべて停止します
+/ ●再開
+/ 	defrost()
+/ 		freeze()関数にて停止されていた場合、当該 SharedContinuousHandler からの呼び出しを再開します
+/ 
+/ 
+/ 注意
+/ 	・同一オブジェクト内の同じ callBack は1つしか呼べません
+/ 	・sleep() はtickミリ秒後勝手に呼び出しを再開します
+/ 	・freeze() は defrost() で再開しないと永遠に止まったままです
+/ 
+/ 	・勝手に
+/ 		SharedContinuousHandler_object
+/ 		SharedContinuousHandler_HIobject
+/ 	の2つのハンドラを定義しています。なんかsleepで止めたく無い系でいきたい系のオブジェクトは
+/ 	HIobjectを使ったら良いと思わなくもなくもない
+/ 
+/ ----------------------------------------------------------
+/ sleep() freeze() defrost() 機能を使いたい場合
+/ 
+/ 	これを呼ぶクラスすべてに onSleep(tick) 関数を作っておくれ
+/ 
+/ 	sleepから起きたとき各オブジェクトの onSleep() 関数を呼ぶので、
+/ 	sleepしてた時間(tick)とオブジェクトの処理の噛み合わせをとっておくれ
+/ 
+/ 		// 一方通行の処理で開始時刻がstarttickなら多分こんなのでok
+/ 　	function onSleep( tick : sleepしていた時間 ) {
+/ 　		 starttick += tick;
+/ 		}
+/ 
+/ ----------------------------------------------------------
+/ デフォは 240fps (4 ms 間隔)で回して、interval に指定した時間が経過するごとに呼ぶ
+/ interval = 16 ならおよそ 60fps、〃 = 64 ならおよそ 15fps
+/ ContinuousHandler の性質上重い処理の時は「カクカク」になる可能性が常にあるので、
+/ 回すものをタイマに改造して確実に撃ち続けた方がいいかもね
+/ 0.6S から機能が増えましたが、0.5S 以前と変わりなく使えます。
+/ 
+/ シューティングゲームとかそういう処理遅延が問題になるケースなら
+/ ContinuousHandler を一括管理するこれは FPS の一元化が可能だから得？
+/ リソースの節約に。
+/ 
+/ そういやFPSの安定化はしてなかったな。STG用にするなら、任意タイミングではなくした方が
+/ 管理が楽なんだが、つまりはFPSを固定して同期ウェイトを取る方法をどうしようかでまた迷う。
+/ もうッッめんどいし止めたッッッッ！！
+/ 吉里吉里の ContinuousHandler は優秀だしなんとでもなるさ。
+/ 
+/ 色んなとこでsleep使いたいときは、そのオブジェクト毎に SharedContinuousHandler
+/ 作った方が管理楽かも。
+/ 
+/ fpsチェック機能は廃止。いらんと思ふ
+/ 
+/-----------------------------------------------------------------------------*/
+@if(__SHAREDCONTINUOUSHANDLER_OBJECT_DEFINED__==0)
+@set(__SHAREDCONTINUOUSHANDLER_OBJECT_DEFINED__=1)
+class SharedContinuousHandler {
+	// fps：数字が大きいほど指定したタイミングに忠実に動作する。ハズ。ですはい
+	var defaultcontfreq = 240;
+
+	var callBacks = [];		// 対象への参照その他を保持する配列
+	var __i = 0;			// onTimer().for ループ、leave() との兼合わせ用
+	var __n = 0;			// callBacks.count 参照用
+
+	var flozeStarttick;		// 凍結開始時刻 tick (ms)
+	var sleepTime;			// 現在時刻 tick ＋眠る時間 (ms)
+	var __onSleep = false;
+	var __onRun = false;
+
+	var SgTC = System.getTickCount;
+
+	function SharedContinuousHandler() {
+	// 処理ウェイトかけて駆動
+		System.setArgument("-contfreq", defaultcontfreq);
+	// 垂直同期待ちして駆動 : defaultcontfreq は意味を持ちません(さて？)
+//		System.setArgument("-waitvsync", "yes");
+	}
+
+	function finalize() {
+		reset();
+		delete callBacks;
+	}
+
+	function entry(ref, inter=0, callBack="onTimer", firstFire=true) {
+		leave(ref, callBack);
+
+		start() if(__n==0 && !__onSleep);
+		__n = callBacks.push( 
+			[ ref, ref[callBack], (int)inter, (firstFire ? 0 : SgTC()) ]
+		);
+	}
+
+	function leave(ref, callBack="onTimer") {
+		if(!ref isvalid) {
+			// ゑ？entry要請された直後に無効化されてるなんてあるかって？
+			// いんだよ、細けぇ事は
+			for(var i=0;i<__n; i++)
+				if(!callBacks[i][0] isvalid) { callBacks.erase(i); __n--; i--; }
+			return;
+		}
+
+		// 同じオブジェクトの同じcallBackがあったら古いのは削除
+		for(var i=0;i<__n; i++) {
+			if(ref[callBack]===callBacks[i][1]) {
+				callBacks.erase(i);
+				__n--;
+				__i-- if(__i>=i);
+				break;
+			}
+		}
+
+		if(__n==0) {
+			stop();
+			reset();
+		}
+		return;
+	}
+
+	function onTimer() {
+		var c = callBacks;
+		var nowtime = SgTC();	// ローカルに落としてやるってばよ
+								// 動かすオブジェクトが少ないと逆に遅くなるかもね
+		for(__i=0; __i<__n; __i++)
+			if(nowtime >=  c[__i][3] + c[__i][2] )
+				c[__i][1](c[__i][3] = nowtime);
+	}
+
+	function reset() {
+		callBacks.clear();
+		__n = 0;
+	}
+
+	// なんかしらんがスタートさせる
+	function start() {
+		if(__onRun) return;
+		__onRun = true;
+		System.addContinuousHandler(onTimer);
+	}
+
+	// なんかしらんがストップさせる
+	function stop() {
+		if(!__onRun) return;
+		__onRun = false;
+		System.removeContinuousHandler(onTimer);
+	}
+
+	// defrostが呼ばれるまで動作を停止する
+	function freeze() {
+		if(__onSleep) return;
+
+		flozeStarttick = SgTC();
+		__onSleep = true;	// start, stop !== sleep なのでフラグはここで管理
+		stop();
+	}
+
+	// freezeで停止した動作を再開する
+	function defrost() {
+		if(!__onSleep) return;
+
+		onSleep( SgTC() - flozeStarttick );
+		__onSleep = false;
+		start();
+	}
+
+	// tickで指定されたミリ秒間動作を停止する
+	// usleep()と間違えたら、ダメだよ？
+	// sleep中のsleep呼び出しは許さない
+	function sleep(tick) {
+		if(__onSleep) return;
+
+		onSleep(tick);
+		sleepTime = tick + SgTC();
+		__onSleep = true;
+		stop();
+		System.addContinuousHandler(sleepTimer);
+	}
+
+	function sleepTimer() {
+		if( sleepTime < SgTC() ) {
+			sleepTime = 0;
+			System.removeContinuousHandler(sleepTimer);
+			start();
+		}
+	}
+
+	// 動作が停止した各オブジェクトのonSleep()を呼ぶ。無かったら呼ばれない
+	// 各々で 処理開始時間+=tick などする
+	function onSleep(tick) {
+		for(var i=0; i<__n; i++)
+			if(typeof callBacks[i][0].onSleep == "undefined")
+				callBacks[i][0].onSleep( tick );
+	}
+
+	function changeContfreq(contfreq) {
+		System.setArgument("-contfreq", contfreq);
+		if(__n) {	// 実行中ならその場で Continuous ハンドラの作り直し
+			stop();
+			start();
+		}
+	}
+}
+var SharedContinuousHandler_object = new SharedContinuousHandler();
+// なんかsleepとかであんまり止めたく無い系でいく系のオブジェクト用
+var SharedContinuousHandler_HIobject = new SharedContinuousHandler();
+@endif
