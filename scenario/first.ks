@@ -60,11 +60,11 @@ Scripts.execStorage("SubRoutine2.tjs");
 ;* ADD
 ;@deffont edge=false shadow=false edgecolor=0xff0000 edgeextent=2 edgeemphasis=1024
 @position vertical=true
-;@deffont edge color=0xffffff shadow=false edgecolor=0x0000ff edgeextent=2 edgeemphasis=2048
+@deffont edge color=0xffffff shadow=false edgecolor=0x000000 edgeextent=5 edgeemphasis=1024
 
-@deffont edge=false shadow shadowcolor=0x000000 shadowoffsetx=20 shadowoffsety=10
+;@deffont edge=false shadow shadowcolor=0xffffff shadowoffsetx=10 shadowoffsety=10
 @resetfont
-@setChGradation color="0x0000FF,0xffffff,0xff0000" method="Rect" recttype=2
+@setChGradation color="0x0000FF,0xffffff,0xff0000,0xffffff,0x00ff00" method="Rect" recttype=2
 ;@setChGradation color="0x0000FF,0x00ffff,0xff00ff,0xff0000" method="Rect" recttype=2
 
 
@@ -87,7 +87,7 @@ Scripts.execStorage("SubRoutine2.tjs");
 あいう[r_は]は[r_は][graph storage="das2pt22.png" alt="――"]え[r_は][graph storage="ExQuestion.png" alt="!?"]お[r]
 [r]
 [r]
-[r]
+[r_あい]あ[r]
 [r]
 [r]
 [link exp="kag.shutdown()" color=0xff0000 hint="吉里吉里/KAGの紹介を終了します"]終了[endlink]

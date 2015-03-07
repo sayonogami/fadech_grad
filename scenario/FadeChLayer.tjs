@@ -451,7 +451,7 @@ class FadeChLayer extends FadeLayer {
 //		fillRect(x, y, 2, 2, 0xFFFF0000);
 //		drawEdge(this, 0, 0, width, height, 0xFFFFFFFF);
 //	drawEdge(this, x, y, 2, 2, 0xFFFFFFFF);
-		drawEdge(this, 0, 0, width, height, 0xFFFFFFFF);
+
 
 
 		show(left - slantMoveX, top - slantMoveY, , (skip?0:deffadetime) ) if !doing;
@@ -624,34 +624,40 @@ class FadeChLayer extends FadeLayer {
 	function OperateGradation(x, y, w, h, ee, sofx, sofy) {
 		// 初期Gradation x y w h
 		//   一文字の中でグラデーションが完結する
-		var g_x=0, g_y=0, g_w=w, g_h=h;
+		var g_x=x, g_y=y, g_w=w, g_h=h;
 
-		if(vertical) {
-			g_x = x; g_y = (hch?y:0);
-			g_w = (hch?ch_width:ch_height) + ml.rubySize + ml.rubyOffset; g_h = (hch?ch_height:ch_width);
-		} else {
-			g_x = 0; g_y = y-ry;
-			g_w = w; g_h = height - ry;
+/*
+		var grad_with_effect = true;
+		if(grad_with_effect) {
+			if(vertical) {
+	//			g_x = x; g_y = y;
+				g_w = (hch?ch_width:ch_height) + ml.rubySize + ml.rubyOffset; g_h = (hch?ch_height:ch_width);
+			} else {
+				g_x = 0; g_y = y-ry;
+				g_w = w; g_h = height - ry;
+			}
 		}
-		// エッジ・影の分だけ領域を拡張
+		// エッジ・影の分だけグラデ領域を拡張
 		if(ee > 0) { // エッジ
-			g_w += ee;
-			g_h += ee;
+			g_x -= ee*1.414/2;
+			g_y -= ee*1.414/2;
+			g_w += ee*1.414;
+			g_h += ee*1.414;
 		} else if(sofx!=0 || sofy!=0) {
 			if(sofx>0) { g_w += sofx; } else { g_w -= sofx; }
 			if(sofy>0) { g_h += sofy; } else { g_h -= sofy; }
-			
-//			g_w += sofx>0?sofx:-sofx;
-//			g_h += sofy>0?sofy:-sofy;
 		}
+*/
 
 		ChGradRecter_object.set( %[
 			width:g_w, height:g_h, x:0, y:0, w:g_w, h:g_h
 		] );
 
-// dm(x, y, w, h, g_x, g_y, g_w, g_h);
+//		drawEdge(this, x, y, w, h, 0xFFFF0000);
+//		drawEdge(this, g_x, g_y, g_w, g_h, 0xFF00FF00);
+//		drawEdge(this, 0, 0, width, height, 0xFF0000FF);
 
-		this.operateRect(x, y, ChGradRecter_object.showLayer, g_x, g_y, w, h, omMultiplicative, 255);
+		this.operateRect(g_x, g_y, ChGradRecter_object.showLayer, 0, 0, g_w, g_h, omMultiplicative, 255);
 /*
 		ChGradRecter_object.set( %[
 				width:g_w, height:g_h, 
@@ -676,7 +682,7 @@ class FadeChLayer extends FadeLayer {
 		} else {
 			OperateGradation(x, y, font.getTextWidth(text), font.getTextHeight(text), ee, sofx, sofy);
 		}
-
+/*
 		// 枠が黒以外だった場合、枠を復活する。
 		if(save_sc !== 0x000000) {
 			// 現在までの描画結果を取っておく
@@ -692,6 +698,7 @@ class FadeChLayer extends FadeLayer {
 			// 比較(明)合成で、影とグラデを合成
 			this.operateRect(0, 0, cl, 0, 0, width, height, omLighten , 255); 
 		}
+*/
 	}
 
 	function rotateText(x, y, trad, set) {
