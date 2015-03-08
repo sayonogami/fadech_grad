@@ -23,8 +23,7 @@ Scripts.execStorage("FadeLayer.tjs");
 class FadeChLayer extends FadeLayer {
 	var __id;
 
-	var ll, ml;			// 親レイヤ
-	var dx, dy;	// これなんだっけ…
+	var ll, ml;	// 親レイヤ
 
 	var vertical;
 	var hch;	// 縦書き時の縦中横フラグ
@@ -36,6 +35,8 @@ class FadeChLayer extends FadeLayer {
 	var fontsize, fontbold, fontface;
 	var textwidth, textheight;	// 回転時に利用するテキスト横幅・縦幅
 
+	var ch_left;		// 親文字のleft
+	var ch_top;			// 親文字のtop
 	var ch_width;		// 親文字の横幅
 	var ch_height;		// 親文字の縦幅
 
@@ -120,10 +121,12 @@ class FadeChLayer extends FadeLayer {
 	//	this.parent = ll;
 		floated = false;
 
-		dx = _dx + slantx + slantMoveX + ll.left;
-		dy = _dy + slanty + slantMoveY + ll.top;
-
-		setPos(dx, dy, _dw, _dh);
+		setPos(
+			_dx + slantx + slantMoveX + ll.left, 
+			_dy + slanty + slantMoveY + ll.top, 
+			_dw, 
+			_dh
+		);
 		r_cw = _dw;
 		r_ch = _dh;
 		visible = true;
@@ -174,13 +177,13 @@ class FadeChLayer extends FadeLayer {
 	function setSlant(x, y) {
 		// 
 		slantx += x; slanty += y;
-		setPos(dx += slantx, dy += slanty);
+		setPos(slantx, slanty);
 	}
 
 	function setSlantMove(x, y) {
 		slantMoveX += x if(x!=0);
 		slantMoveY += y if(y!=0);
-		setPos(dx += x, dy += y);
+		setPos(x, y);
 	}
 
 	function setRad(r) {
@@ -253,7 +256,6 @@ class FadeChLayer extends FadeLayer {
 	}
 
 	function changedChLinePos(cx, cy) {
-		this.dx += cx, this.dy += cy;
 		startl += cx, startt += cy;
 		goall += cx, goalt += cy;
 		if(!doing) { left+=cx, top+=cy; }
@@ -336,7 +338,6 @@ class FadeChLayer extends FadeLayer {
 		nowisenabled= comp.nowisenabled;
 		starttick	= comp.starttick;
 		doing		= comp.doing;
-		dx			= comp.dx;			dy		= comp.dy;
 		vertical	= comp.vertical;
 		opacity		= comp.opacity;
 		floated		= comp.floated;
@@ -403,7 +404,7 @@ class FadeChLayer extends FadeLayer {
 				for(var i=0; i<ruby.length; i++) {
 					drawText_adv(rx, ry, ruby[i], col, opa, aa, sl, sc, sw, sofx, sofy);
 					if(vertical) ry += span + font.getTextWidth(ruby[i]);
-					else			  rx += span + font.getTextWidth(ruby[i]);
+					else		 rx += span + font.getTextWidth(ruby[i]);
 				}
 			} else {			// 均等割り付け以外
 				drawText_adv(rx, ry, ruby, col, opa, aa, sl, sc, sw, sofx, sofy);
@@ -472,7 +473,7 @@ class FadeChLayer extends FadeLayer {
 		var save_visible = this.visible;
 		this.visible = false;
 
-		if(ChGradRecter_object.grad_each_ch && text.length > 1 && !hch) {
+		if(ChGradRecter_object.eachCh && text.length > 1 && !hch) {
 			var c_x = x;
 			var c_y = y;
 			for(var i=0; i<text.length; i++) {
@@ -626,37 +627,52 @@ class FadeChLayer extends FadeLayer {
 		//   一文字の中でグラデーションが完結する
 		var g_x=x, g_y=y, g_w=w, g_h=h;
 		var p_x=0, p_y=0;
-/*
-		var grad_with_effect = true;
-		if(grad_with_effect) {
+
+//ChGradRecter_object.withRuby
+//ChGradRecter_object.ruby
+//ChGradRecter_object.withEdge
+
+
+		if(ChGradRecter_object.withRuby) {
 			if(vertical) {
 	//			g_x = x; g_y = y;
-				g_w = (hch?ch_width:ch_height) + ml.rubySize + ml.rubyOffset; g_h = (hch?ch_height:ch_width);
+				g_w = ch_height + ml.rubySize + ml.rubyOffset;
+				g_h = ch_width;
 			} else {
-				g_x = 0; g_y = y-ry;
-				g_w = w; g_h = height - ry;
-			}
-			// エッジ・影の分だけグラデ領域を拡張
-			if(ee > 0) { // エッジ
-				g_x -= ee*1.414/2;
-				g_y -= ee*1.414/2;
-				g_w += ee*1.414;
-				g_h += ee*1.414;
-			} else if(sofx!=0 || sofy!=0) {
-				if(sofx>0) { g_w += sofx; } else { g_w -= sofx; }
-				if(sofy>0) { g_h += sofy; } else { g_h -= sofy; }
+				g_x = 0;
+				g_y = y-ry;
+				g_w = w;
+				g_h = height - ry;
 			}
 			p_x = g_x;
 			p_y = g_y;
 		}
-*/
+
+		if(ChGradRecter_object.withEdge) {
+			// エッジ・影の分だけグラデ領域を拡張
+			if(ee > 0) { // エッジ
+				var r = ee*1.414;
+				g_x -= r/2;
+				g_y -= r/2;
+				p_x = g_x;
+				p_y = g_y;
+				g_w += r;
+				g_h += r;
+			} else if(sofx!=0 || sofy!=0) {
+				if(sofx>0) { g_w += sofx; } else { g_w -= sofx; }
+				if(sofy>0) { g_h += sofy; } else { g_h -= sofy; }
+			}
+		}
+
 		ChGradRecter_object.set( %[
 			width:g_w, height:g_h, x:0, y:0, w:g_w, h:g_h
 		] );
 
-//		drawEdge(this, x, y, w, h, 0xFFFF0000);
-//		drawEdge(this, g_x, g_y, g_w, g_h, 0xFF00FF00);
-//		drawEdge(this, 0, 0, width, height, 0xFF0000FF);
+//		this.fillRect(0,0,width, height, 0xFFFFFFFF);
+//		drawEdge(this, x, y, w, h, 0xFFFF0000);				// 赤 
+//		drawEdge(this, g_x, g_y, g_w, g_h, 0xFF00FF00);		// 緑 
+//		drawEdge(this, 0, 0, width, height, 0xFF0000FF);	// 青 
+//		drawEdge(this, p_x, p_y, g_w, g_h, 0xFF00FF00);		// 
 
 		this.operateRect(g_x, g_y, ChGradRecter_object.showLayer, p_x, p_y, g_w, g_h, omMultiplicative, 255);
 /*

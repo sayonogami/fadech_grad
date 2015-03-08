@@ -13,3 +13,14 @@ exprhist=
 stayontop=0
 font=pEpPpPpPaAaAaAaAaAaAaAaAaAaAaAaAjAaBaAaAaAaAaAiAaAaAaAaAiCgMiChCcAjGlOjCkJaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaA
 
+[watch]
+left=22
+top=55
+width=299
+height=223
+col0width=140
+col1width=400
+stayontop=0
+exprlist=
+interval=1000
+

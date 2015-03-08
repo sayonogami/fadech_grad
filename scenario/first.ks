@@ -60,11 +60,13 @@ Scripts.execStorage("SubRoutine2.tjs");
 ;* ADD
 ;@deffont edge=false shadow=false edgecolor=0xff0000 edgeextent=2 edgeemphasis=1024
 @position vertical=true
-@deffont edge color=0xffffff shadow=false edgecolor=0x000000 edgeextent=5 edgeemphasis=1024
+@deffont edge color=0xffffff shadow=false edgecolor=0x0000ff edgeextent=2 edgeemphasis=1024
+@deffont face="@ÇlÇr Çoñæí©" size=24 bold=false rubyface="@ÇlÇr ÉSÉVÉbÉN"
 
 ;@deffont edge=false shadow shadowcolor=0xffffff shadowoffsetx=10 shadowoffsety=10
 @resetfont
-@setChGradation color="0x0000FF,0xffffff,0xff0000,0xffffff,0x00ff00" method="Rect" recttype=2
+@setChGradation color="0xFF0000,0xffffff,0xFF0000" method="Rect" recttype=3 dir=45 withruby=false withEdge=false
+;@setChGradation color="0x0000FF,0xffffff,0xff0000,0xffffff,0x00ff00" method="Rect" recttype=2 withruby withEdge=false
 ;@setChGradation color="0x0000FF,0x00ffff,0xff00ff,0xff0000" method="Rect" recttype=2
 
 
@@ -87,7 +89,8 @@ Scripts.execStorage("SubRoutine2.tjs");
 Ç†Ç¢Ç§[r_ÇÕ]ÇÕ[r_ÇÕ][graph storage="das2pt22.png" alt="Å\Å\"]Ç¶[r_ÇÕ][graph storage="ExQuestion.png" alt="!?"]Ç®[r]
 [r]
 [r]
-[r_Ç†Ç¢]Ç†[r]
+[r_Ç†Ç¢Ç§Ç¶Ç®Ç©]Ç†[r]
+;[r_Ç†Ç¢Ç§Ç¶Ç®Ç©Ç´Ç≠ÇØÇ±][ch_Ç†Ç¢Ç§Ç¶][r]
 [r]
 [r]
 [link exp="kag.shutdown()" color=0xff0000 hint="ãgó¢ãgó¢/KAGÇÃè–âÓÇèIóπÇµÇ‹Ç∑"]èIóπ[endlink]

@@ -1204,10 +1204,12 @@ class ChGradRecter extends RecterPlugin {
 	var base_param_arr = new Array();
 
 	// 描画設定集 FadeChLayerから参照される
-	var independent_ruby = true;	// ルビは独立してグラデる
-	var grad_ruby = true;	// ルビをグラデる
-	var grad_edge = true;	// エッジもグラデる(白は完全にグラデる。黒は黒のまま)
-	var grad_each_ch = true;	// 1文字1文字グラデる
+	var ruby = true;	// ルビをグラデる
+	var withRuby = true;	// ルビは独立してグラデる
+	var withEdge = true;	// エッジもグラデる(白は完全にグラデる。黒は黒のまま)
+	var eachCh = true;	// 1文字1文字グラデる
+
+//	var eachCh = true;	// 1文字1文字グラデる
 
 	function ChGradRecter(window, plgName) {
 		super.RecterPlugin(...);
@@ -1218,11 +1220,19 @@ class ChGradRecter extends RecterPlugin {
 		super.finalize(...);
 	}
 
+
+	/*
+	/ elm.withruby, elm.ruby, elm.withedge, elm.eachch
+	*/
 	function setChGrad(elm) {
 		(Dictionary.clear incontextof base_param)();
 		(Dictionary.assign incontextof base_param)(elm);
 		base_param_arr.assign(base_param);
 		doChGrad = true;
+		ruby = elm.ruby if elm.ruby!==void;	// ルビをグラデる
+		withRuby = elm.withruby if elm.withruby!==void; // ルビは独立してグラデる
+		withEdge = elm.withedge if elm.withedge!==void; //エッジもグラデる(白は完全にグラデる。黒は黒のまま)
+		eachCh = elm.eachch if elm.eachch!==void;
 	}
 
 	function finishChGrad(elm) {
@@ -1288,10 +1298,10 @@ class ChGradRecter extends RecterPlugin {
 			.base_param = %[];
 			(Dictionary.assign incontextof .base_param)(base_param);
 			.doChGrad = doChGrad;
-			.independent_ruby = independent_ruby;
-			.grad_ruby = grad_ruby;
-			.grad_edge = grad_edge;
-			.grad_each_ch = grad_each_ch;
+			.ruby = ruby;
+			.withRuby = withRuby;
+			.withEdge = withEdge;
+			.eachCh = eachCh;
 		}
 	}
 
@@ -1301,10 +1311,10 @@ class ChGradRecter extends RecterPlugin {
 		with(f[pluginName]) {
 			(Dictionary.assign incontextof base_param)(.base_param);
 			doChGrad = .doChGrad;
-			independent_ruby = .independent_ruby;
-			grad_ruby = .grad_ruby;
-			grad_edge = .grad_edge;
-			grad_each_ch = .grad_each_ch;
+			ruby = .ruby;
+			withRuby = .withRuby;
+			withEdge = .withEdge;
+			eachCh = .eachCh;
 		}
 	}
 }
