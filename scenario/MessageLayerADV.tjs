@@ -1209,8 +1209,6 @@ class ChGradRecter extends RecterPlugin {
 	var withEdge = true;	// エッジもグラデる(白は完全にグラデる。黒は黒のまま)
 	var eachCh = true;	// 1文字1文字グラデる
 
-//	var eachCh = true;	// 1文字1文字グラデる
-
 	function ChGradRecter(window, plgName) {
 		super.RecterPlugin(...);
 	//	neutralColor = 0x00FFFFFF;

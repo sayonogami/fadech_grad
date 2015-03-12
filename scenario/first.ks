@@ -65,7 +65,7 @@ Scripts.execStorage("SubRoutine2.tjs");
 
 ;@deffont edge=false shadow shadowcolor=0xffffff shadowoffsetx=10 shadowoffsety=10
 @resetfont
-@setChGradation color="0xFF0000,0xffffff,0xFF0000" method="Rect" recttype=3 dir=45 withruby=false withEdge=false
+@setChGradation color="0xFF0000,0xffffff,0xFF0000" method="Rect" recttype=3 dir=45 withruby=false withEdge=false eachch=false
 ;@setChGradation color="0x0000FF,0xffffff,0xff0000,0xffffff,0x00ff00" method="Rect" recttype=2 withruby withEdge=false
 ;@setChGradation color="0x0000FF,0x00ffff,0xff00ff,0xff0000" method="Rect" recttype=2
 
@@ -90,7 +90,8 @@ Scripts.execStorage("SubRoutine2.tjs");
 [r]
 [r]
 [r_Ç†Ç¢Ç§Ç¶Ç®Ç©]Ç†[r]
-;[r_Ç†Ç¢Ç§Ç¶Ç®Ç©Ç´Ç≠ÇØÇ±][ch_Ç†Ç¢Ç§Ç¶][r]
+[r_Ç†Ç¢Ç§Ç¶Ç®Ç©Ç´Ç≠ÇØÇ±][ch_Ç†Ç¢Ç§Ç¶][r]
+[ch_Ç†Ç¢Ç§Ç¶][r]
 [r]
 [r]
 [link exp="kag.shutdown()" color=0xff0000 hint="ãgó¢ãgó¢/KAGÇÃè–âÓÇèIóπÇµÇ‹Ç∑"]èIóπ[endlink]
