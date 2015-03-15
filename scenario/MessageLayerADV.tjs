@@ -10,7 +10,7 @@ defaulthchcorrect		// hchの中心を合わせるための補正値
 
 var __flag_ChGradRecter_OBJECT_DEFINED__ = false;
 Scripts.execStorage("SubRoutine.tjs");
-// FadeChLayerは下で読み込む
+Scripts.execStorage("FadeChLayer.tjs");
 
 class MessageLayerADV extends MessageLayer {
 	var hankakuPitch = 0;		// 半角の字間
@@ -82,10 +82,17 @@ class MessageLayerADV extends MessageLayer {
 	var id__ = 0;
 
 	var canChGrad = false;	// 文字グラデーションが可能か
+	var chGradObj = void;
 
-
-	function MessageLayerADV() {
+	function MessageLayerADV(owner, parent, name, id, do_config) {
 		super.MessageLayer(...);
+
+		if(__flag_ChGradRecter_OBJECT_DEFINED__==1) {
+			chGradObj = new ChGradRecter(kag, name+"_ChGradRecter");
+			kag.addPlugin(chGradObj);
+			canChGrad = true;
+//			dm("__flag_ChGradRecter_OBJECT_DEFINED__  " + kag.currentWithBack);
+		}
 	}
 
 	function finalize() {
@@ -710,6 +717,10 @@ dm("initChLayer : " + in_x, in_y, in_w, in_h);
 			__ch.assign(comp.processedfadeChLayers[i]);
 		}
 		movingCh = comp.movingCh;
+
+		if(canChGrad) {
+			chGradObj.assign(comp.chGradObj);
+		}
 	}
 
 /*--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=-
@@ -819,7 +830,6 @@ dm("initChLayer : " + in_x, in_y, in_w, in_h);
 		rubyOverflow	=	defaultRubyOverflow;
 		hchCorrect		=	defaultHchCorrect;
 
-	dm(hchCorrect, defaultHchCorrect);
 		super.resetFont();
 	}
 
@@ -860,8 +870,6 @@ dm("initChLayer : " + in_x, in_y, in_w, in_h);
 		defaultRubyAlign = elm.rubyalign if elm.rubyalign !== void;
 		defaultRubyOverflow = elm.rubyoverflow if elm.rubyoverflow !== void;
 		defaultHchCorrect = +elm.hchcorrect if elm.hchcorrect !== void;
-
-	dm(hchCorrect, defaultHchCorrect);
 
 		super.setDefaultFont(elm);
 	}
@@ -1233,6 +1241,16 @@ class ChGradRecter extends RecterPlugin {
 		eachCh = elm.eachch if elm.eachch!==void;
 	}
 
+	function assign(src) {
+		(Dictionary.assign incontextof base_param)(src.base_param);
+		base_param_arr.assign(src.base_param_arr);
+		doChGrad = src.doChGrad;
+		ruby = src.ruby;
+		withRuby = src.withRuby;
+		withEdge = src.withEdge;
+		eachCh = src.eachCh;
+	}
+
 	function finishChGrad(elm) {
 		doChGrad = false;
 		finish();
@@ -1316,23 +1334,20 @@ class ChGradRecter extends RecterPlugin {
 		}
 	}
 }
-ChGradRecter_object = new ChGradRecter(kag, "RecterPlugin_ChGradRecter");
-kag.addPlugin(ChGradRecter_object);
 
 kag.tagHandlers.setchgradation = function(elm) {
-	ChGradRecter_object.setChGrad(elm);
+	if(currentWithBack) current.comp.chGradObj.setChGrad(elm);
+	current.chGradObj.setChGrad(elm);
 	return 0;
 } incontextof kag;
 
 kag.tagHandlers.resetchgradation = function(elm) {
-	ChGradRecter_object.finishChGrad(elm);
+	if(currentWithBack) current.comp.chGradObj.finishChGrad(elm);
+	current.chGradObj.finishChGrad(elm);
 	return 0;
 } incontextof kag;
 
 }
-
-// プリプロセッサの関係で、FadeChLayerはここで読み込む
-Scripts.execStorage("FadeChLayer.tjs");
 
 
 

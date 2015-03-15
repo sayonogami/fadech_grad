@@ -468,7 +468,7 @@ class FadeChLayer extends FadeLayer {
 			super.drawText(...);
 			return;
 		}
-		if(!ChGradRecter_object.doChGrad) {
+		if(!ml.chGradObj.doChGrad) {
 			super.drawText(...);
 			return;
 		}
@@ -478,7 +478,7 @@ class FadeChLayer extends FadeLayer {
 		this.visible = false;
 
 		// eachCh
-		if(ChGradRecter_object.eachCh && text.length > 1 && !flag_hch) {
+		if(ml.chGradObj.eachCh && text.length > 1 && !flag_hch) {
 			var c_x = x;
 			var c_y = y;
 			for(var i=0; i<text.length; i++) {
@@ -491,7 +491,7 @@ class FadeChLayer extends FadeLayer {
 				}
 			}
 		} else {
-//			if(!ChGradRecter_object.eachCh && ) { }
+//			if(!ml.chGradObj.eachCh && ) { }
 
 
 			drawGradCh(x, y, text, col, opa, aa, sl, sc, sw, sofx, sofy);
@@ -640,7 +640,7 @@ class FadeChLayer extends FadeLayer {
 //ChGradRecter_object.ruby
 //ChGradRecter_object.withEdge
 /*
-		if(!ChGradRecter_object.eachCh && ruby==="") {
+		if(!ml.chGradObj.eachCh && ruby==="") {
 			if(vertical) {
 				ry = 0;
 				rx = int(x + ml.rubySize + ml.rubyOffset);
@@ -652,7 +652,7 @@ class FadeChLayer extends FadeLayer {
 			ry += expandY;
 		}
 */
-		if(ChGradRecter_object.withRuby) {
+		if(ml.chGradObj.withRuby) {
 			if(vertical) {
 	//			g_x = x; g_y = y;
 				g_w = ch_height + ml.rubySize + ml.rubyOffset;
@@ -667,7 +667,7 @@ class FadeChLayer extends FadeLayer {
 			p_y = g_y;
 		}
 
-		if(ChGradRecter_object.withEdge) {
+		if(ml.chGradObj.withEdge) {
 			// エッジ・影の分だけグラデ領域を拡張
 			if(ee > 0) { // エッジ
 				var r = ee*1.414;
@@ -683,7 +683,7 @@ class FadeChLayer extends FadeLayer {
 			}
 		}
 
-		ChGradRecter_object.set( %[
+		ml.chGradObj.set( %[
 			width:g_w, height:g_h, x:0, y:0, w:g_w, h:g_h
 		] );
 
@@ -693,9 +693,9 @@ class FadeChLayer extends FadeLayer {
 //		drawEdge(this, 0, 0, width, height, 0xFF0000FF);	// 青 
 //		drawEdge(this, p_x, p_y, g_w, g_h, 0xFF00FF00);		// 
 
-		this.operateRect(g_x, g_y, ChGradRecter_object.showLayer, p_x, p_y, g_w, g_h, omMultiplicative, 255);
+		this.operateRect(g_x, g_y, ml.chGradObj.showLayer, p_x, p_y, g_w, g_h, omMultiplicative, 255);
 /*
-		ChGradRecter_object.set( %[
+		ml.chGradObj.set( %[
 				width:g_w, height:g_h, 
 				color:"0x0000FF,0x00FFFF,0x00FF00", 
 				method:"Circle", 
