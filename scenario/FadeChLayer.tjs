@@ -26,8 +26,9 @@ class FadeChLayer extends FadeLayer {
 	var ll, ml;	// 親レイヤ
 
 	var vertical;
-	var flag_hch;	// 縦書き時の縦中横フラグ
-	var flag_hch_ch;	// 縦書き時の縦中横、本文フラグ
+	var flag_ch;
+	var flag_ruby;
+	var flag_hch;
 
 
 	var floated;		// （改行などで）他のFadeChLayerから影響を受けなくなったか
@@ -141,8 +142,10 @@ class FadeChLayer extends FadeLayer {
 		textwidth = textheight = 0;
 		expandX = expandY = 0;
 		name="";
+
+		flag_ch = false;
+		flag_ruby = false;
 		flag_hch = false;
-		flag_hch_ch = false;
 
 		imageWidth = 8;	imageHeight = 8;
 		setSizeToImageSize();
@@ -402,6 +405,7 @@ class FadeChLayer extends FadeLayer {
 
 		// ルビ
 		if(ruby!="") {
+			flag_ruby = true;
 			font.height=rubysize; font.bold=rubybold; font.face=rubyface;
 			rubywidth = font.getTextWidth(ruby); // ※親文字字間拡張機能用
 			if(rubymode=="e" && ch_width > rubywidth) {		// 均等割り付け
@@ -414,8 +418,10 @@ class FadeChLayer extends FadeLayer {
 				drawText_adv(rx, ry, ruby, col, opa, aa, sl, sc, sw, sofx, sofy);
 			}
 			font.face=fontface; font.bold=fontbold; font.height=fontsize;
+			flag_ruby = false;
 		}
 
+		flag_ch = true;
 		// 本文
 		if(ruby!="" && rubymode=="e" && rubywidth > ch_width && text.length >=2 ) {
 			// ※親文字字間拡張機能
@@ -468,7 +474,11 @@ class FadeChLayer extends FadeLayer {
 			super.drawText(...);
 			return;
 		}
-		if(!ml.chGradObj.doChGrad) {
+
+		if(!ml.chGradObj.doChGrad
+		  || ( !ml.chGradObj.ch && flag_ch )
+		  || ( !ml.chGradObj.ch && flag_hch )
+		  || ( !ml.chGradObj.ruby && flag_ruby )  ) {
 			super.drawText(...);
 			return;
 		}
@@ -510,11 +520,13 @@ class FadeChLayer extends FadeLayer {
 
 		// ルビ
 		if(ruby!="") {
+			flag_ruby = true;
 			if(vertical) { rx += ch_width; }
 //			var rubybase = fontsize > ch_height ? (fontsize+ch_height)/2:ch_height;
 			font.height=rubysize; font.bold=rubybold; font.face=rubyface;
 			drawText_adv(rx, ry, ruby, color, 255, ml.antialiased, eEm, esC, ee, sX, sY);
 			font.face=fontface; font.bold=fontbold; font.height=fontsize;
+			flag_ruby = false;
 		}
 
 		if(ischar && (edge || shadow)) {
@@ -600,6 +612,7 @@ class FadeChLayer extends FadeLayer {
 		ch_height = font.getTextWidth(text);
 
 		if(ruby!="") {
+			flag_ruby = true;
 			// 縦書きのｘは右上なので、ルビ計算用のxを修正
 			var rubybase = fontsize > ch_height ? (fontsize+ch_height)/2:ch_height;
 			font.angle = 2700;	// calcRubyPosはアングルを計算に入れないので、ここで変更
@@ -610,12 +623,13 @@ class FadeChLayer extends FadeLayer {
 			font.face=rubyface; font.bold=rubybold; font.height=rubysize; font.angle = 2700;
 			drawText_adv(rx, ry, ruby, col, opa, aa, sl, sc, sw, sofx, sofy);
 
-			flag_hch_ch = true;
+			flag_ruby = false;
+			flag_hch = true;
 			font.face=fontface; font.bold=fontbold; font.height=fontsize; font.angle = 0;
 			drawText_adv(x, y, text, col, opa, aa, sl, sc, sw, sofx, sofy);
 		} else {
+			flag_hch = true;
 			x += expandX; y += expandY;	// 位置補正
-			flag_hch_ch = true;
 			drawText_adv(x, y, text, col, opa, aa, sl, sc, sw, sofx, sofy);
 		}
 
@@ -663,8 +677,8 @@ class FadeChLayer extends FadeLayer {
 				g_w = w;
 				g_h = height - ry;
 			}
-			p_x = g_x;
-			p_y = g_y;
+//			p_x = g_x;
+//			p_y = g_y;
 		}
 
 		if(ml.chGradObj.withEdge) {
@@ -713,7 +727,7 @@ class FadeChLayer extends FadeLayer {
 
 		super.drawText(...);
 
-		if(vertical && !flag_hch_ch) {
+		if(vertical && !flag_hch) {
 			OperateGradation(x-font.height, y, font.getTextHeight(text), font.getTextWidth(text), ee, sofx, sofy);
 		} else {
 			OperateGradation(x, y, font.getTextWidth(text), font.getTextHeight(text), ee, sofx, sofy);

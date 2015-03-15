@@ -1212,9 +1212,10 @@ class ChGradRecter extends RecterPlugin {
 	var base_param_arr = new Array();
 
 	// 描画設定集 FadeChLayerから参照される
+	var ch = true;	// 文字をグラデる
 	var ruby = true;	// ルビをグラデる
 	var withRuby = true;	// ルビは独立してグラデる
-	var withEdge = true;	// エッジもグラデる(白は完全にグラデる。黒は黒のまま)
+	var withEdge = true;	// エッジもグラデる
 	var eachCh = true;	// 1文字1文字グラデる
 
 	function ChGradRecter(window, plgName) {
@@ -1226,7 +1227,6 @@ class ChGradRecter extends RecterPlugin {
 		super.finalize(...);
 	}
 
-
 	/*
 	/ elm.withruby, elm.ruby, elm.withedge, elm.eachch
 	*/
@@ -1237,8 +1237,12 @@ class ChGradRecter extends RecterPlugin {
 		doChGrad = true;
 		ruby = elm.ruby if elm.ruby!==void;	// ルビをグラデる
 		withRuby = elm.withruby if elm.withruby!==void; // ルビは独立してグラデる
-		withEdge = elm.withedge if elm.withedge!==void; //エッジもグラデる(白は完全にグラデる。黒は黒のまま)
+		withEdge = elm.withedge if elm.withedge!==void; //エッジをグラデる
 		eachCh = elm.eachch if elm.eachch!==void;
+		ch = elm.ch if elm.ch!==void;
+
+		// ルビグラデが無いときはルビ込みも無効になる
+		if(!ruby) withRuby = false;
 	}
 
 	function assign(src) {
@@ -1249,6 +1253,7 @@ class ChGradRecter extends RecterPlugin {
 		withRuby = src.withRuby;
 		withEdge = src.withEdge;
 		eachCh = src.eachCh;
+		ch = src.ch;
 	}
 
 	function finishChGrad(elm) {
