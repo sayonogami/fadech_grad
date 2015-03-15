@@ -678,7 +678,8 @@ class FadeChLayer extends FadeLayer {
 				if(flag_ruby) p_x = ch_height + ml.rubyOffset;
 				g_w = ch_height + ml.rubySize + ml.rubyOffset;
 			} else {
-				g_h = height - ry;
+				if(flag_ch) p_y += ml.rubySize + ml.rubyOffset;
+				g_h = ch_height + ml.rubySize + ml.rubyOffset;
 			}
 		}
 
@@ -688,8 +689,6 @@ class FadeChLayer extends FadeLayer {
 				var r = ee*1.414;
 				g_x -= r/2;
 				g_y -= r/2;
-			//	p_x = g_x;
-			//	p_y = g_y;
 				g_w += r;
 				g_h += r;
 			} else if(sofx!=0 || sofy!=0) {
@@ -698,7 +697,7 @@ class FadeChLayer extends FadeLayer {
 			}
 		}
 
-dm(ch_left, ch_top, ch_width, ch_height, g_x, g_y, g_w, g_h);
+// dm(ch_left, ch_top, ch_width, ch_height, g_x, g_y, g_w, g_h);
 
 		ml.chGradObj.set( %[
 			width:g_w, height:g_h, x:0, y:0, w:g_w, h:g_h
