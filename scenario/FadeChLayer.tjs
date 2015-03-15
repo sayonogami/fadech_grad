@@ -400,6 +400,9 @@ class FadeChLayer extends FadeLayer {
 		if(ruby!="") {	calcRubyPos(x, y);	}	// ルビ計算
 		x += expandX; y += expandY;	// 位置補正
 
+		ch_left = x;
+		ch_top = y;
+
 		// ※親文字字間拡張機能
 		var rubywidth = 0; // とりあえず：親文字の字間を開ける機能。ルビの長さ
 
@@ -408,7 +411,7 @@ class FadeChLayer extends FadeLayer {
 			flag_ruby = true;
 			font.height=rubysize; font.bold=rubybold; font.face=rubyface;
 			rubywidth = font.getTextWidth(ruby); // ※親文字字間拡張機能用
-			if(rubymode=="e" && ch_width > rubywidth) {		// 均等割り付け
+			if(rubymode=="e" && text.length>1 && ch_width>rubywidth) {	// 均等割り付け
 				for(var i=0; i<ruby.length; i++) {
 					drawText_adv(rx, ry, ruby[i], col, opa, aa, sl, sc, sw, sofx, sofy);
 					if(vertical) ry += span + font.getTextWidth(ruby[i]);
@@ -502,8 +505,6 @@ class FadeChLayer extends FadeLayer {
 			}
 		} else {
 //			if(!ml.chGradObj.eachCh && ) { }
-
-
 			drawGradCh(x, y, text, col, opa, aa, sl, sc, sw, sofx, sofy);
 		}
 		this.visible = save_visible;
@@ -517,6 +518,9 @@ class FadeChLayer extends FadeLayer {
 		if(ruby!="") { calcRubyPos(cx, cy); }	// ルビ計算
 
 		cx += expandX; cy += expandY;
+
+		ch_left = cx;
+		ch_top = cy;
 
 		// ルビ
 		if(ruby!="") {
@@ -620,6 +624,9 @@ class FadeChLayer extends FadeLayer {
 			calcRubyPos(x + rubybase - parent.hchCorrect, y);
 			x += expandX; y += expandY;	// 位置補正
 
+			ch_left = x;
+			ch_top = y;
+
 			font.face=rubyface; font.bold=rubybold; font.height=rubysize; font.angle = 2700;
 			drawText_adv(rx, ry, ruby, col, opa, aa, sl, sc, sw, sofx, sofy);
 
@@ -630,6 +637,8 @@ class FadeChLayer extends FadeLayer {
 		} else {
 			flag_hch = true;
 			x += expandX; y += expandY;	// 位置補正
+			ch_left = x;
+			ch_top = y;
 			drawText_adv(x, y, text, col, opa, aa, sl, sc, sw, sofx, sofy);
 		}
 
@@ -648,11 +657,8 @@ class FadeChLayer extends FadeLayer {
 		// 初期Gradation x y w h
 		//   一文字の中でグラデーションが完結する
 		var g_x=x, g_y=y, g_w=w, g_h=h;
-		var p_x=0, p_y=0;
+		var p_x=0, p_y=0, p_w=w, p_h=h;
 
-//ChGradRecter_object.withRuby
-//ChGradRecter_object.ruby
-//ChGradRecter_object.withEdge
 /*
 		if(!ml.chGradObj.eachCh && ruby==="") {
 			if(vertical) {
@@ -666,19 +672,14 @@ class FadeChLayer extends FadeLayer {
 			ry += expandY;
 		}
 */
+
 		if(ml.chGradObj.withRuby) {
 			if(vertical) {
-	//			g_x = x; g_y = y;
+				if(flag_ruby) p_x = ch_height + ml.rubyOffset;
 				g_w = ch_height + ml.rubySize + ml.rubyOffset;
-				g_h = ch_width;
 			} else {
-			//	g_x = 0;
-			//	g_y = y-ry;
-				g_w = w;
 				g_h = height - ry;
 			}
-//			p_x = g_x;
-//			p_y = g_y;
 		}
 
 		if(ml.chGradObj.withEdge) {
@@ -687,8 +688,8 @@ class FadeChLayer extends FadeLayer {
 				var r = ee*1.414;
 				g_x -= r/2;
 				g_y -= r/2;
-				p_x = g_x;
-				p_y = g_y;
+			//	p_x = g_x;
+			//	p_y = g_y;
 				g_w += r;
 				g_h += r;
 			} else if(sofx!=0 || sofy!=0) {
@@ -696,6 +697,8 @@ class FadeChLayer extends FadeLayer {
 				if(sofy>0) { g_h += sofy; } else { g_h -= sofy; }
 			}
 		}
+
+dm(ch_left, ch_top, ch_width, ch_height, g_x, g_y, g_w, g_h);
 
 		ml.chGradObj.set( %[
 			width:g_w, height:g_h, x:0, y:0, w:g_w, h:g_h
@@ -707,7 +710,7 @@ class FadeChLayer extends FadeLayer {
 //		drawEdge(this, 0, 0, width, height, 0xFF0000FF);	// 青 
 //		drawEdge(this, p_x, p_y, g_w, g_h, 0xFF00FF00);		// 
 
-		this.operateRect(g_x, g_y, ml.chGradObj.showLayer, p_x, p_y, g_w, g_h, omMultiplicative, 255);
+		this.operateRect(g_x, g_y, ml.chGradObj.showLayer, p_x, p_y, p_w, p_h, omMultiplicative, 255);
 /*
 		ml.chGradObj.set( %[
 				width:g_w, height:g_h, 
