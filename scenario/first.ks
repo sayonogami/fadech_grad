@@ -60,16 +60,20 @@ Scripts.execStorage("SubRoutine2.tjs");
 ;* ADD
 ;@deffont edge=false shadow=false edgecolor=0xff0000 edgeextent=2 edgeemphasis=1024
 @position vertical=false
-@deffont edge color=0xffffff shadow=false edgecolor=0x000000 edgeextent=2 edgeemphasis=1024
+@deffont edge color=0xffffff shadow=false edgecolor=0x00ff00 edgeextent=20 edgeemphasis=1024
 @deffont face="‚l‚r ‚o–¾’©" size=24 bold=false rubyface="‚l‚r ƒSƒVƒbƒN"
 ;@deffont face="@‚l‚r ‚o–¾’©" size=24 bold=false rubyface="@‚l‚r ƒSƒVƒbƒN"
 
 ;@deffont edge=false shadow shadowcolor=0xffffff shadowoffsetx=10 shadowoffsety=10
 @resetfont
 ;@setChGradation color="0x0000FF,0xffffff,0xff0000,0xffffff,0x00ff00" method="Rect" recttype=2 withruby withEdge=false
+
 ;@setChGradation color="0x0000FF,0x00ffff,0xff00ff,0xff0000" method="Rect" recttype=2
-@setChGradation color="0xffffff,0xffffff,0xFF0000,0xFF0000" method="Circle" recttype=1 dir=90 withruby=false withEdge=false eachch ruby=false
-;@setChGradation color="0xFF0000,0x00ffff" method="Rect" recttype=1 dir=90 withruby withEdge=false eachch ruby
+
+@setChGradation color="0xFF0000,0x0000ff" method="Circle" recttype=1 dir=90 withruby=false withEdge=false eachch ruby=false
+
+;@setChGradation color="0xFF0000,0x0000ff" method="Rect" recttype=1 dir=90 withruby withEdge eachch ruby
+
 ;@setChGradation color="0xFF0000,0xFF0000,0xffffff,0x00ffff,0x00ffff" method="Rect" recttype=1 dir=45 withruby=true withEdge=false eachch=false ruby
 
 
