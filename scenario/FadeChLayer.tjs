@@ -729,7 +729,7 @@ class FadeChLayer extends FadeLayer {
 //		drawEdge(this, x, y, w, h, 0xFFFF0000);				// ê‘ 
 //		drawEdge(this, g_x, g_y, g_w, g_h, 0xFF00FF00);		// óŒ 
 //		drawEdge(this, 0, 0, width, height, 0xFF0000FF);	// ê¬ 
-		drawEdge(this, g_x, g_y, g_w, g_h, 0xFF00FF00);		// 
+//		drawEdge(this, g_x, g_y, g_w, g_h, 0xFF00FF00);		// 
 
 		this.operateRect(g_x, g_y, ml.chGradObj.showLayer, p_x, p_y, p_w, p_h, omMultiplicative, 255);
 	}
