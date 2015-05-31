@@ -58,11 +58,13 @@ Scripts.execStorage("SubRoutine2.tjs");
 @startanchor
 
 ;* ADD
+; withedge :: ‚È‚µ
+;
 ;@deffont edge=false shadow=false edgecolor=0xff0000 edgeextent=2 edgeemphasis=1024
 @position vertical=true
 @deffont edge color=0xffffff shadow=false edgecolor=0x00ff00 edgeextent=2 edgeemphasis=1024
 ;@deffont face="‚l‚r ‚o–¾’©" size=24 bold=false rubyface="‚l‚r ƒSƒVƒbƒN"
-@deffont face="@‚l‚r ‚o–¾’©" size=24 bold=false rubyface="@‚l‚r ƒSƒVƒbƒN"
+@deffont face="@‚l‚r ‚o–¾’©" size=24 bold rubyface="@‚l‚r ƒSƒVƒbƒN"
 
 ;@deffont edge=false shadow shadowcolor=0xffffff shadowoffsetx=10 shadowoffsety=10
 @resetfont
@@ -70,9 +72,9 @@ Scripts.execStorage("SubRoutine2.tjs");
 
 ;@setChGradation color="0x0000FF,0x00ffff,0xff00ff,0xff0000" method="Rect" recttype=2
 
-@setChGradation color="0xFF0000,0x0000ff" method="Circle" recttype=1 dir=90 withruby=false withEdge=false eachch ruby=false
+;@setChGradation color="0xFF0000,0x0000ff" method="Circle" recttype=1 dir=90 withruby=false withEdge=false eachch ruby=false
 
-;@setChGradation color="0xFF0000,0x0000ff" method="Rect" recttype=1 dir=90 withruby withEdge eachch ruby
+@setChGradation color="0xFF0000,0x0000ff" method="Rect" recttype=2 dir=90 withruby=false withEdge eachch ruby
 
 ;@setChGradation color="0xFF0000,0xFF0000,0xffffff,0x00ffff,0x00ffff" method="Rect" recttype=1 dir=45 withruby=true withEdge=false eachch=false ruby
 
@@ -100,6 +102,7 @@ Scripts.execStorage("SubRoutine2.tjs");
 [r]
 [r_‚ ‚¢]‚ [r]
 [r_‚ ‚¢‚¤‚¦‚¨‚©‚«‚­‚¯‚±][ch_‚ ‚¢‚¤‚¦][r]
+[r_‹Ï“™Š„‚è‚Ì‹N‚«‚È‚¢‚ ‚¢‚¤‚¦‚¨‚©‚«‚­‚¯‚±][ch_‚ ‚¢‚¤‚¦][r]
 [ch_‚ ‚¢‚¤‚¦][r]
 [r]
 [link exp="kag.shutdown()" color=0xff0000 hint="‹g—¢‹g—¢/KAG‚ÌĞ‰î‚ğI—¹‚µ‚Ü‚·"]I—¹[endlink]

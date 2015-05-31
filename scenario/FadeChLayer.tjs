@@ -466,8 +466,6 @@ class FadeChLayer extends FadeLayer {
 //		drawEdge(this, 0, 0, width, height, 0xFFFFFFFF);
 //	drawEdge(this, x, y, 2, 2, 0xFFFFFFFF);
 
-
-
 		show(left - slantMoveX, top - slantMoveY, , (skip?0:deffadetime) ) if !doing;
 	}
 
@@ -491,21 +489,31 @@ class FadeChLayer extends FadeLayer {
 		this.visible = false;
 
 		// eachCh
+		// •¶ŽšƒOƒ‰ƒf‚ð‘S•¶Žš•`‰æ ¨ ƒGƒbƒW‚ð•`‰æ
 		if(ml.chGradObj.eachCh && text.length > 1 && !flag_hch) {
 			var c_x = x;
 			var c_y = y;
 			for(var i=0; i<text.length; i++) {
-				var g_ch = text[i];
-				drawGradCh(c_x, c_y, g_ch, col, opa, aa, sl, sc, sw, sofx, sofy);
+				drawGradCh(c_x, c_y, text[i], col, opa, aa, sl, sc, sw, sofx, sofy);
 				if(vertical) {
-					c_y += font.getTextWidth(g_ch);
+					c_y += font.getTextWidth(text[i]);
 				} else {
-					c_x += font.getTextWidth(g_ch);
+					c_x += font.getTextWidth(text[i]);
+				}
+			}
+			c_x = x;
+			c_y = y;
+			for(var i=0; i<text.length; i++) {
+				drawGradCh_Edge(c_x, c_y, text[i], col, opa, aa, sl, sc, sw, sofx, sofy);
+				if(vertical) {
+					c_y += font.getTextWidth(text[i]);
+				} else {
+					c_x += font.getTextWidth(text[i]);
 				}
 			}
 		} else {
-//			if(!ml.chGradObj.eachCh && ) { }
 			drawGradCh(x, y, text, col, opa, aa, sl, sc, sw, sofx, sofy);
+			drawGradCh_Edge(x, y, text, col, opa, aa, sl, sc, sw, sofx, sofy);
 		}
 		this.visible = save_visible;
 	}
@@ -738,32 +746,33 @@ class FadeChLayer extends FadeLayer {
 / @ •¶ŽšƒGƒtƒFƒNƒg
 */
 	function drawGradCh(x, y, text, col, opa=255, aa=true, sl=255, sc=0, ee=0, sofx=0, sofy=0) {
-		var save_sc = sc;
-	//	sc = 0xFF000000;	// ‰e‚ð•‚É‚µ‚ÄƒOƒ‰ƒf•`‰æ
+		sc = 0xFF000000;	// ‰e‚ð•‚É‚µ‚ÄƒOƒ‰ƒf•`‰æ
 
-		super.drawText(...);
+		super.drawText(x, y, text, col, opa, aa, sl, sc, ee, sofx, sofy);
 
 		if(vertical && !flag_hch) {
 			OperateGradation(x-font.height, y, font.getTextHeight(text), font.getTextWidth(text), ee, sofx, sofy);
 		} else {
 			OperateGradation(x, y, font.getTextWidth(text), font.getTextHeight(text), ee, sofx, sofy);
 		}
+	}
 
-		// ˜g‚ª•ˆÈŠO‚¾‚Á‚½ê‡A˜g‚ð•œŠˆ‚·‚éB
-		if(save_sc !== 0x000000) {
-			// Œ»Ý‚Ü‚Å‚Ì•`‰æŒ‹‰Ê‚ðŽæ‚Á‚Ä‚¨‚­
-			cl.setSize(this.width, this.height);
-			cl.fillRect(0, 0, width, height, 0x00000000);
-			cl.copyRect(0, 0, this, 0, 0, width, height);
-
-			sc = save_sc;	// ‰e‚ð–{—ˆ‚ÌF‚É‚µ‚Ä•¶Žš•`‰æ
-			col = 0x000000;	// ”äŠr(–¾)‡¬‚ÅŽg‚¤‚Ì‚Å•¶ŽšF‚Í•
-			fillRect(0, 0, width, height, 0x00000000);
-			super.drawText(x, y, text, col, opa, aa, sl, sc, ee, sofx, sofy);
-
-			// ”äŠr(–¾)‡¬‚ÅA‰e‚ÆƒOƒ‰ƒf‚ð‡¬
-			this.operateRect(0, 0, cl, 0, 0, width, height, omLighten, 255); 
+	function drawGradCh_Edge(x, y, text, col, opa=255, aa=true, sl=255, sc=0, ee=0, sofx=0, sofy=0) {
+		if(sc === 0x000000) {
+			return;
 		}
+
+		// Œ»Ý‚Ü‚Å‚Ì•`‰æŒ‹‰Ê‚ðŽæ‚Á‚Ä‚¨‚­
+		cl.setSize(this.width, this.height);
+		cl.fillRect(0, 0, cl.width, cl.height, 0x00000000);
+		cl.copyRect(0, 0, this, 0, 0, this.width, this.height);
+
+		col = 0x000000;	// ”äŠr(–¾)‡¬‚ÅŽg‚¤‚Ì‚Å•¶ŽšF‚Í•
+		fillRect(0, 0, this.width, this.height, 0x00000000);
+		super.drawText(x, y, text, col, opa, aa, sl, sc, ee, sofx, sofy);
+
+		// ”äŠr(–¾)‡¬‚ÅA‰e‚ÆƒOƒ‰ƒf‚ð‡¬
+		this.operateRect(0, 0, cl, 0, 0, this.width, this.height, omLighten, 255); 
 
 		// cl‘Sˆæ‚ðƒNƒŠƒA
 		cl.fillRect(0, 0, cl.width, cl.height, 0x00000000);
