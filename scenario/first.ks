@@ -62,7 +62,7 @@ Scripts.execStorage("SubRoutine2.tjs");
 ;
 ;@deffont edge=false shadow=false edgecolor=0xff0000 edgeextent=2 edgeemphasis=1024
 @position vertical=true
-@deffont edge color=0xffffff shadow=false edgecolor=0x00ff00 edgeextent=2 edgeemphasis=1024
+@deffont edge color=0xffffff shadow=false edgecolor=0xffffff edgeextent=2 edgeemphasis=2048
 ;@deffont face="‚l‚r ‚o–¾’©" size=24 bold=false rubyface="‚l‚r ƒSƒVƒbƒN"
 @deffont face="@‚l‚r ‚o–¾’©" size=24 bold rubyface="@‚l‚r ƒSƒVƒbƒN"
 

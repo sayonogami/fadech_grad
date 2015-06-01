@@ -349,6 +349,11 @@ class FadeLayer extends Layer {
 	function drawText(x, y, text, col, opa=255, aa=true, sl=255, sc=0, sw=0, sofx=0, sofy=0) {
 		super.drawText(x, y, text, col, opa, aa, sl, sc, sw, sofx, sofy);
 	}
+
+	function drawTextPlain(x, y, text, col, opa, aa, sl, sc, sw, sofx, sofy) {
+		super.drawText(...);
+	}
+
 /*
 	// 大きく書いてから線形縮小することで滑らかな文字が描画できないかテスト
 	// 線形補間はできたけど、もっと高精度の縮小補間でないと綺麗に出なかったです
