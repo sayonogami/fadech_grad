@@ -664,6 +664,42 @@ class FadeChLayer extends FadeLayer {
 		show(left - slantMoveX, top - slantMoveY, , (skip?0:deffadetime) ) if !doing;
 	}
 
+/*
+/ @ 文字エフェクト
+*/
+	function drawGradCh(x, y, text, col, opa=255, aa=true, sl=255, sc=0, ee=0, sofx=0, sofy=0) {
+	//	sc = 0xFF000000;	// 影を黒にしてグラデ描画
+
+		super.drawText(x, y, text, col, opa, aa, sl, sc, ee, sofx, sofy);
+
+		if(vertical && !flag_hch) {
+			OperateGradation(x-font.height, y, font.getTextHeight(text), font.getTextWidth(text), ee, sofx, sofy);
+		} else {
+			OperateGradation(x, y, font.getTextWidth(text), font.getTextHeight(text), ee, sofx, sofy);
+		}
+	}
+
+	function drawGradCh_Edge(x, y, text, col, opa=255, aa=true, sl=255, sc=0, ee=0, sofx=0, sofy=0) {
+		if(sc === 0x000000) {
+			return;
+		}
+
+		// 現在までの描画結果を取っておく
+		cl.setSize(this.width, this.height);
+		cl.fillRect(0, 0, cl.width, cl.height, 0x00000000);
+		cl.copyRect(0, 0, this, 0, 0, this.width, this.height);
+
+		col = 0x000000;	// 比較(明)合成で使うので文字色は黒
+		fillRect(0, 0, this.width, this.height, 0x00000000);
+		super.drawText(x, y, text, col, opa, aa, sl, sc, ee, sofx, sofy);
+
+		// 比較(明)合成で、影とグラデを合成
+		this.operateRect(0, 0, cl, 0, 0, this.width, this.height, omLighten, 255); 
+
+		// cl全域をクリア
+		cl.fillRect(0, 0, cl.width, cl.height, 0x00000000);
+	}
+
 	function OperateGradation(x, y, w, h, ee, sofx, sofy) {
 		// 初期Gradation x y w h
 		//   一文字の中でグラデーションが完結する
@@ -740,42 +776,6 @@ class FadeChLayer extends FadeLayer {
 //		drawEdge(this, g_x, g_y, g_w, g_h, 0xFF00FF00);		// 
 
 		this.operateRect(g_x, g_y, ml.chGradObj.showLayer, p_x, p_y, p_w, p_h, omMultiplicative, 255);
-	}
-
-/*
-/ @ 文字エフェクト
-*/
-	function drawGradCh(x, y, text, col, opa=255, aa=true, sl=255, sc=0, ee=0, sofx=0, sofy=0) {
-		sc = 0xFF000000;	// 影を黒にしてグラデ描画
-
-		super.drawText(x, y, text, col, opa, aa, sl, sc, ee, sofx, sofy);
-
-		if(vertical && !flag_hch) {
-			OperateGradation(x-font.height, y, font.getTextHeight(text), font.getTextWidth(text), ee, sofx, sofy);
-		} else {
-			OperateGradation(x, y, font.getTextWidth(text), font.getTextHeight(text), ee, sofx, sofy);
-		}
-	}
-
-	function drawGradCh_Edge(x, y, text, col, opa=255, aa=true, sl=255, sc=0, ee=0, sofx=0, sofy=0) {
-		if(sc === 0x000000) {
-			return;
-		}
-
-		// 現在までの描画結果を取っておく
-		cl.setSize(this.width, this.height);
-		cl.fillRect(0, 0, cl.width, cl.height, 0x00000000);
-		cl.copyRect(0, 0, this, 0, 0, this.width, this.height);
-
-		col = 0x000000;	// 比較(明)合成で使うので文字色は黒
-		fillRect(0, 0, this.width, this.height, 0x00000000);
-		super.drawText(x, y, text, col, opa, aa, sl, sc, ee, sofx, sofy);
-
-		// 比較(明)合成で、影とグラデを合成
-		this.operateRect(0, 0, cl, 0, 0, this.width, this.height, omLighten, 255); 
-
-		// cl全域をクリア
-		cl.fillRect(0, 0, cl.width, cl.height, 0x00000000);
 	}
 
 	function rotateText(x, y, trad, set) {

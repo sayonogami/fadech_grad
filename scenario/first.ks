@@ -72,7 +72,7 @@ Scripts.execStorage("SubRoutine2.tjs");
 
 ;@setChGradation color="0x0000FF,0x00ffff,0xff00ff,0xff0000" method="Rect" recttype=2
 
-;@setChGradation color="0xFF0000,0x0000ff" method="Circle" recttype=1 dir=90 withruby=false withEdge=false eachch ruby=false
+;@setChGradation color="0xFF00ff,0x000000" method="Circle" recttype=1 dir=90 withruby=false withEdge=false eachch ruby=false
 
 @setChGradation color="0xFF0000,0x0000ff" method="Rect" recttype=2 dir=90 withruby=false withEdge eachch ruby
 
