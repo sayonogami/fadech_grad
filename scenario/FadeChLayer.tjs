@@ -756,8 +756,8 @@ class FadeChLayer extends FadeLayer {
 				g_w += r;
 				g_h += r;
 			} else if(sofx!=0 || sofy!=0) {
-				if(sofx>0) { g_w += sofx; } else { g_w -= sofx; }
-				if(sofy>0) { g_h += sofy; } else { g_h -= sofy; }
+				if(sofx>0) { g_w += sofx; p_w += sofx; } else { g_x += sofx; p_w -= sofx; }
+				if(sofy>0) { g_h += sofy; p_h += sofy; } else { g_y += sofy; p_h -= sofy; }
 			}
 		}
 
@@ -782,12 +782,6 @@ class FadeChLayer extends FadeLayer {
 				] );
 			break;
 		}
-
-//		this.fillRect(0,0,width, height, 0xFFFFFFFF);
-//		drawEdge(this, x, y, w, h, 0xFFFF0000);				// ê‘ 
-//		drawEdge(this, g_x, g_y, g_w, g_h, 0xFF00FF00);		// óŒ 
-//		drawEdge(this, 0, 0, width, height, 0xFF0000FF);	// ê¬ 
-//		drawEdge(this, g_x, g_y, g_w, g_h, 0xFF00FF00);		// 
 
 		GradChLayer.operateRect(g_x, g_y, ml.chGradObj.showLayer, p_x, p_y, p_w, p_h, omMultiplicative, 255);
 	}
