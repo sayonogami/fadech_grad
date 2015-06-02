@@ -474,8 +474,8 @@ class FadeChLayer extends FadeLayer {
 		}
 
 		if(!ml.chGradObj.doChGrad
-		  || ( !ml.chGradObj.ch && flag_ch )
-		  || ( !ml.chGradObj.ch && flag_hch )
+		  || ( !(ml.chGradObj.ch || ml.chGradObj.edge) && flag_ch )
+		  || ( !(ml.chGradObj.ch || ml.chGradObj.edge) && flag_hch )
 		  || ( !ml.chGradObj.ruby && flag_ruby )  ) {
 			drawTextPlain(...);
 			return;
@@ -551,14 +551,16 @@ class FadeChLayer extends FadeLayer {
 			drawGraphShadow(cx, cy, lay, color, ischar, edge, shadow, ee, esC, eEm, sX, sY);
 			operateRect(0, 0, cl, 0, 0, width, height, omAlpha, 255);
 		//	cl.fillRect(0, 0, cl.width, cl.height, 0x00000000); // 全域をクリア
-			if(ml.chGradObj.doChGrad && ml.chGradObj.ch) {
+			if(ml.chGradObj.doChGrad) {
 				initGradChLayer();
 				GradChLayer.operateRect(0, 0, cl, 0, 0, width, height, omAlpha, 255);
 				OperateGradation(cx, cy, ch_width, ch_height, ee, sX, sY);
 
-				// エッジ生成
-				drawGraphShadow(cx, cy, lay, color, ischar, edge, shadow, ee, 0x000000, eEm, sX, sY);	// エッジ
-//				drawGraphShadow(cx, cy, lay, 0x000000, ischar, edge, shadow, ee, esC, eEm, sX, sY);	// 文字
+
+				var gColor = color, gEdgeColor = esC;
+				if(ml.chGradObj.ch) { gColor = 0x000000; }
+				if(ml.chGradObj.edge) { gEdgeColor = 0x000000; }
+				drawGraphShadow(cx, cy, lay, gColor, ischar, edge, shadow, ee, gEdgeColor, eEm, sX, sY);
 
 				// 比較(明)合成で、影とグラデを合成
 				GradChLayer.operateRect(0, 0, cl, 0, 0, this.width, this.height, omLighten, 255); 
@@ -698,8 +700,11 @@ class FadeChLayer extends FadeLayer {
 
 		// 比較(明)合成で使うので、グラデーションを保持する部分は黒
 		GradChLayer.fillRect(0, 0, this.width, this.height, 0x00000000);
-		GradChLayer.drawTextPlain(x, y, text, col, opa, aa, sl, 0x000000, ee, sofx, sofy);	// エッジグラデ
-//		GradChLayer.drawTextPlain(x, y, text, 0x000000, opa, aa, sl, sc, ee, sofx, sofy);	// 文字グラデ
+
+		var gColor = col, gEdgeColor = sc;
+		if(ml.chGradObj.ch) { gColor = 0x000000; }
+		if(ml.chGradObj.edge) { gEdgeColor = 0x000000; }
+		GradChLayer.drawTextPlain(x, y, text, gColor, opa, aa, sl, gEdgeColor, ee, sofx, sofy);
 
 		// 比較(明)合成で、影とグラデを合成
 		GradChLayer.operateRect(0, 0, cl, 0, 0, this.width, this.height, omLighten, 255); 
