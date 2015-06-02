@@ -1231,7 +1231,18 @@ class ChGradRecter extends RecterPlugin {
 	}
 
 	/*
-	/ elm.withruby, elm.ruby, elm.withedge, elm.eachch
+	/ ch		文字をグラデる
+	/ edge		エッジをグラデる
+	/ 
+	/ 以下、普段は指定しないでよい要素
+	/ ruby		ルビをグラデる
+	/			chまたはedgeが指定されたとき、デフォルトでtrue
+	/ withRuby	本文とルビを合わせて一つのグラデーションでグラデる
+	/			デフォルトでfalse
+	/ withEdge	エッジ部分までグラデーションの領域を拡張する
+	/			デフォルトはedge指定と同じ値
+	/ eachCh	chタグやrubyタグで複数文字を指定したときに、1文字ずつグラデる
+	/			デフォルトでtrue
 	*/
 	function setChGrad(elm) {
 		(Dictionary.clear incontextof base_param)();
@@ -1244,7 +1255,7 @@ class ChGradRecter extends RecterPlugin {
 		withRuby = elm.withruby!==void ? elm.withruby : false; // ルビは独立してグラデる
 		withEdge = elm.withedge!==void ? elm.withedge : false;	//エッジをグラデる
 
-		eachCh = elm.eachch!==void ? elm.eachch : false;
+		eachCh = elm.eachch!==void ? elm.eachch : true;
 
 		// ルビグラデが無いときはルビ込みも無効になる
 		if(!ruby) { withRuby = false; }
