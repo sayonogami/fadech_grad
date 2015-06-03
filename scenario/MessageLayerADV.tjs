@@ -1287,6 +1287,8 @@ class ChGradRecter extends RecterPlugin {
 
 	function resetChGrad() {
 		base_param_arr.assign(def_base_param_arr);
+		method = def_method;
+
 		ch = def_ch;
 		edge = def_edge;
 		ruby = def_ruby;
@@ -1437,8 +1439,8 @@ kag.tagHandlers.setchgradation = function(elm) {
 } incontextof kag;
 
 kag.tagHandlers.resetchgradation = function(elm) {
-	if(currentWithBack) current.comp.chGradObj.finishChGrad(elm);
-	current.chGradObj.finishChGrad(elm);
+	if(currentWithBack) current.comp.chGradObj.resetChGrad(elm);
+	current.chGradObj.resetChGrad(elm);
 	return 0;
 } incontextof kag;
 
