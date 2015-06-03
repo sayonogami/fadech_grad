@@ -761,7 +761,7 @@ class FadeChLayer extends FadeLayer {
 			}
 		}
 
-		switch(ml.chGradObj.comp_param.method) {
+		switch(ml.chGradObj.method) {
 			case 'Rect':
 				ml.chGradObj.set( %[
 					width:g_w, height:g_h, x:0, y:0, w:g_w, h:g_h
@@ -774,7 +774,6 @@ class FadeChLayer extends FadeLayer {
 				ml.chGradObj.set( %[
 					width:g_w, height:g_h, x:c_x, y:c_y, r:c_r
 				] );
-				dm(c_x, c_y, c_r);
 			break;
 			default:
 				ml.chGradObj.set( %[

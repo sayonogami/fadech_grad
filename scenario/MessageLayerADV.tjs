@@ -535,7 +535,6 @@ class MessageLayerADV extends MessageLayer {
 			var dr_x = (fontSize-c_w)\2;
 			var dr_y = set_cy(0);
 
-
 // TODO : shadow
 dm("initChLayer : " + in_x, in_y, in_w, in_h);
 
@@ -1206,20 +1205,25 @@ class ChGradRecter extends RecterPlugin {
 
 	// 描画条件比較用パラメータ
 	var comp_param = %[];
-	// 基本セッティング
-	var base_param = %[];
-	// 基本セッティングクロール用配列
-	var base_param_arr = new Array();
 
 	// 描画設定集 FadeChLayerから参照される
 	var ch = true;	// 文字をグラデる
 	var ruby = false;	// ルビをグラデる
-
 	var edge = false;	// エッジをグラデる
-
 	var withRuby = false;	// ルビは独立してグラデる
 	var withEdge = false;	// エッジもグラデる
 	var eachCh = true;	// 1文字1文字グラデる
+	var base_param_arr = new Array();	// 基本セッティングクロール用配列
+	var method;
+
+	var def_ch = true;		// デフォルト
+	var def_ruby = false;
+	var def_edge = false;
+	var def_withRuby = false;
+	var def_withEdge = false;
+	var def_eachCh = true;
+	var def_base_param_arr = new Array();
+	var def_method = "Rect";
 
 	function ChGradRecter(window, plgName) {
 		super.RecterPlugin(...);
@@ -1245,38 +1249,73 @@ class ChGradRecter extends RecterPlugin {
 	/			デフォルトでtrue
 	*/
 	function setChGrad(elm) {
-		(Dictionary.clear incontextof base_param)();
-		(Dictionary.assign incontextof base_param)(elm);
-		base_param_arr.assign(base_param);
+		var p = %[];
+		(Dictionary.assign incontextof p)(elm);
+		base_param_arr.assign(p);
+		method = elm.method!==void ? elm.method : def_method;
 
-		ch = elm.ch!==void ? elm.ch : false;
-		edge = elm.edge!==void ? elm.edge : false;
-		ruby = elm.ruby!==void ? elm.ruby : false;
-		withRuby = elm.withruby!==void ? elm.withruby : false; // ルビは独立してグラデる
-		withEdge = elm.withedge!==void ? elm.withedge : false;	//エッジをグラデる
-
-		eachCh = elm.eachch!==void ? elm.eachch : true;
-
-		// ルビグラデが無いときはルビ込みも無効になる
-		if(!ruby) { withRuby = false; }
-		// edgeグラデが有効で、かつwithedge指定がないとき、withedgeが有効になる
-		if(edge && elm.withedge===void) { withEdge = true; }
-		// chかedgeグラデが有効で、かつruby指定がないとき、rubyが有効になる
-		if((ch || edge) && elm.ruby===void) { ruby = true; }
+		ch = elm.ch!==void ? elm.ch : def_ch;
+		edge = elm.edge!==void ? elm.edge : def_edge;
+		ruby = elm.ruby!==void ? elm.ruby : def_ruby;
+		withRuby = elm.withruby!==void ? elm.withruby : def_withRuby;
+		withEdge = elm.withedge!==void ? elm.withedge : def_withEdge;
+		eachCh = elm.eachch!==void ? elm.eachch : def_eachCh;
 
 		doChGrad = (ch || edge || ruby);
 	}
 
+	function setDefaultChGrad(elm) {
+		var p = %[];
+		(Dictionary.assign incontextof p)(elm);
+		def_base_param_arr.assign(p);
+		def_method = elm.method if elm.method !== void;
+
+		def_ch = elm.ch if elm.ch!==void;
+		def_edge = elm.edge if elm.edge!==void;
+		def_ruby = elm.ruby if elm.ruby!==void;
+		def_withRuby = elm.withruby if elm.withruby!==void;
+		def_withEdge = elm.withedge if elm.withedge!==void;
+		def_eachCh = elm.eachch if elm.eachch!==void;
+
+		// ルビグラデが無いときはルビ込みも無効になる
+		if(!def_ruby) { def_withRuby = false; }
+		// edgeグラデが有効で、かつwithedge指定がないとき、withedgeが有効になる
+		if(def_edge && elm.withedge===void) { def_withEdge = true; }
+		// chかedgeグラデが有効で、かつruby指定がないとき、rubyが有効になる
+		if((def_ch || def_edge) && elm.ruby===void) { def_ruby = true; }
+	}
+
+	function resetChGrad() {
+		base_param_arr.assign(def_base_param_arr);
+		ch = def_ch;
+		edge = def_edge;
+		ruby = def_ruby;
+		withRuby = def_withRuby;
+		withEdge = def_withEdge;
+		eachCh = def_eachCh;
+
+		doChGrad = (ch || edge || ruby);
+	}
+
+
 	function assign(src) {
-		(Dictionary.assign incontextof base_param)(src.base_param);
 		base_param_arr.assign(src.base_param_arr);
+		method = src.method;
 		ch = src.ch;
 		edge = src.edge;
 		ruby = src.ruby;
-
 		withRuby = src.withRuby;
 		withEdge = src.withEdge;
 		eachCh = src.eachCh;
+
+		def_base_param_arr.assign(src.def_base_param_arr);
+		def_method = src.def_method;
+		def_ch = src.ch;
+		def_edge = src.edge;
+		def_ruby = src.ruby;
+		def_withRuby = src.withRuby;
+		def_withEdge = src.withEdge;
+		def_eachCh = src.eachCh;
 
 		doChGrad = src.doChGrad;
 	}
@@ -1303,7 +1342,7 @@ class ChGradRecter extends RecterPlugin {
 				 && .x===elm.x && .y===elm.y && .w===elm.w && .h===elm.h
 				) ? redraw : true;
 
-			switch(.method) {
+			switch(method) {
 				case 'Rect':
 					redraw = (.recttype===elm.recttype && .dir===elm.dir) ? redraw : true;
 				break;
@@ -1341,13 +1380,27 @@ class ChGradRecter extends RecterPlugin {
 	function onStore(f, elm) {
 		super.onStore(...);
 		with(f[pluginName]) {
-			.base_param = %[];
-			(Dictionary.assign incontextof .base_param)(base_param);
+			.def_base_param_arr = new Array();
+			.base_param_arr = new Array();
+
+			.base_param_arr.assign(base_param_arr);
+			.method = method;
 			.doChGrad = doChGrad;
+			.ch = ch;
+			.edge = edge;
 			.ruby = ruby;
 			.withRuby = withRuby;
 			.withEdge = withEdge;
 			.eachCh = eachCh;
+
+			.def_base_param_arr.assign(def_base_param_arr);
+			.def_method = def_method;
+			.def_ch = def_ch;
+			.def_edge = def_edge;
+			.def_ruby = def_ruby;
+			.def_withRuby = def_withRuby;
+			.def_withEdge = def_withEdge;
+			.def_eachCh = def_eachCh;
 		}
 	}
 
@@ -1355,12 +1408,24 @@ class ChGradRecter extends RecterPlugin {
 		if(f[pluginName]===void) return;
 		super.onRestore(...);
 		with(f[pluginName]) {
-			(Dictionary.assign incontextof base_param)(.base_param);
+			base_param_arr.assign(.base_param_arr);
+			.method = method;
 			doChGrad = .doChGrad;
+			ch = .ch;
+			edge = .edge;
 			ruby = .ruby;
 			withRuby = .withRuby;
 			withEdge = .withEdge;
 			eachCh = .eachCh;
+
+			def_base_param_arr.assign(.def_base_param_arr);
+			def_method = .def_method;
+			def_ch = .def_ch;
+			def_edge = .def_edge;
+			def_ruby = .def_ruby;
+			def_withRuby = .def_withRuby;
+			def_withEdge = .def_withEdge;
+			def_eachCh = .def_eachCh;
 		}
 	}
 }
@@ -1377,6 +1442,18 @@ kag.tagHandlers.resetchgradation = function(elm) {
 	return 0;
 } incontextof kag;
 
+kag.tagHandlers.stopchgradation = function(elm) {
+	if(currentWithBack) current.comp.chGradObj.finishChGrad(elm);
+	current.chGradObj.finishChGrad(elm);
+	return 0;
+} incontextof kag;
+
+
+kag.tagHandlers.setdefaultchgradation = function(elm) {
+	if(currentWithBack) current.comp.chGradObj.setDefaultChGrad(elm);
+	current.chGradObj.setDefaultChGrad(elm);
+	return 0;
+} incontextof kag;
 }
 
 
