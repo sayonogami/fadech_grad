@@ -716,11 +716,18 @@ dm("initChLayer : " + in_x, in_y, in_w, in_h);
 			__ch.assign(comp.processedfadeChLayers[i]);
 		}
 		movingCh = comp.movingCh;
-
 		if(canChGrad) {
 			chGradObj.assign(comp.chGradObj);
 		}
 	}
+
+	function exchangeInfo()
+	{
+		super.exchangeInfo();
+
+		chGradObj.pluginName <-> comp.chGradObj.pluginName;
+	}
+
 
 /*--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=-
 / @文字エフェクト・周期的を追加
@@ -1207,23 +1214,23 @@ class ChGradRecter extends RecterPlugin {
 	var comp_param = %[];
 
 	// 描画設定集 FadeChLayerから参照される
+	var base_param_arr = new Array();	// 基本セッティングクロール用配列
+	var method;
 	var ch = true;	// 文字をグラデる
 	var ruby = false;	// ルビをグラデる
 	var edge = false;	// エッジをグラデる
 	var withRuby = false;	// ルビは独立してグラデる
 	var withEdge = false;	// エッジもグラデる
 	var eachCh = true;	// 1文字1文字グラデる
-	var base_param_arr = new Array();	// 基本セッティングクロール用配列
-	var method;
 
+	var def_base_param_arr = new Array();
+	var def_method = "Rect";
 	var def_ch = true;		// デフォルト
 	var def_ruby = false;
 	var def_edge = false;
 	var def_withRuby = false;
 	var def_withEdge = false;
 	var def_eachCh = true;
-	var def_base_param_arr = new Array();
-	var def_method = "Rect";
 
 	function ChGradRecter(window, plgName) {
 		super.RecterPlugin(...);
@@ -1249,9 +1256,7 @@ class ChGradRecter extends RecterPlugin {
 	/			デフォルトでtrue
 	*/
 	function setChGrad(elm) {
-		var p = %[];
-		(Dictionary.assign incontextof p)(elm);
-		base_param_arr.assign(p);
+		base_param_arr.assign(elm);
 		method = elm.method!==void ? elm.method : def_method;
 
 		ch = elm.ch!==void ? elm.ch : def_ch;
@@ -1265,9 +1270,7 @@ class ChGradRecter extends RecterPlugin {
 	}
 
 	function setDefaultChGrad(elm) {
-		var p = %[];
-		(Dictionary.assign incontextof p)(elm);
-		def_base_param_arr.assign(p);
+		def_base_param_arr.assign(elm);
 		def_method = elm.method if elm.method !== void;
 
 		def_ch = elm.ch if elm.ch!==void;
@@ -1299,7 +1302,6 @@ class ChGradRecter extends RecterPlugin {
 		doChGrad = (ch || edge || ruby);
 	}
 
-
 	function assign(src) {
 		base_param_arr.assign(src.base_param_arr);
 		method = src.method;
@@ -1312,12 +1314,12 @@ class ChGradRecter extends RecterPlugin {
 
 		def_base_param_arr.assign(src.def_base_param_arr);
 		def_method = src.def_method;
-		def_ch = src.ch;
-		def_edge = src.edge;
-		def_ruby = src.ruby;
-		def_withRuby = src.withRuby;
-		def_withEdge = src.withEdge;
-		def_eachCh = src.eachCh;
+		def_ch = src.def_ch;
+		def_edge = src.def_edge;
+		def_ruby = src.def_ruby;
+		def_withRuby = src.def_withRuby;
+		def_withEdge = src.def_withEdge;
+		def_eachCh = src.def_eachCh;
 
 		doChGrad = src.doChGrad;
 	}
@@ -1369,7 +1371,6 @@ class ChGradRecter extends RecterPlugin {
 		}
 
 		if(redraw) {
-		//	dm("ChGradRecter : "+ redraw);
 			(Dictionary.assign incontextof comp_param)(elm);	// 条件コピー
 			elm.absolute = 1;
 			elm.hide = true;
@@ -1382,12 +1383,13 @@ class ChGradRecter extends RecterPlugin {
 	function onStore(f, elm) {
 		super.onStore(...);
 		with(f[pluginName]) {
-			.def_base_param_arr = new Array();
+			.doChGrad = doChGrad;
+
 			.base_param_arr = new Array();
+			.def_base_param_arr = new Array();
 
 			.base_param_arr.assign(base_param_arr);
 			.method = method;
-			.doChGrad = doChGrad;
 			.ch = ch;
 			.edge = edge;
 			.ruby = ruby;
@@ -1407,27 +1409,38 @@ class ChGradRecter extends RecterPlugin {
 	}
 
 	function onRestore(f, clear, elm) {
-		if(f[pluginName]===void) return;
 		super.onRestore(...);
-		with(f[pluginName]) {
-			base_param_arr.assign(.base_param_arr);
-			.method = method;
-			doChGrad = .doChGrad;
-			ch = .ch;
-			edge = .edge;
-			ruby = .ruby;
-			withRuby = .withRuby;
-			withEdge = .withEdge;
-			eachCh = .eachCh;
 
-			def_base_param_arr.assign(.def_base_param_arr);
-			def_method = .def_method;
-			def_ch = .def_ch;
-			def_edge = .def_edge;
-			def_ruby = .def_ruby;
-			def_withRuby = .def_withRuby;
-			def_withEdge = .def_withEdge;
-			def_eachCh = .def_eachCh;
+		if(f[pluginName]===void) return;
+ 		with(f[pluginName]) {
+			if(.doChGrad) {
+				doChGrad = .doChGrad;
+
+				base_param_arr = new Array();
+				if(.base_param_arr !== void) {
+					base_param_arr.assign(.base_param_arr);
+				}
+
+				method = .method;
+				ch = .ch;
+				edge = .edge;
+				ruby = .ruby;
+				withRuby = .withRuby;
+				withEdge = .withEdge;
+				eachCh = .eachCh;
+
+				def_base_param_arr = new Array();
+				if(.def_base_param_arr !== void) {
+					def_base_param_arr.assign(.def_base_param_arr);
+				}
+				def_method = .def_method;
+				def_ch = .def_ch;
+				def_edge = .def_edge;
+				def_ruby = .def_ruby;
+				def_withRuby = .def_withRuby;
+				def_withEdge = .def_withEdge;
+				def_eachCh = .def_eachCh;
+			}
 		}
 	}
 }
@@ -1456,6 +1469,7 @@ kag.tagHandlers.setdefaultchgradation = function(elm) {
 	current.chGradObj.setDefaultChGrad(elm);
 	return 0;
 } incontextof kag;
+
 }
 
 
