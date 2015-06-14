@@ -1225,7 +1225,7 @@ class ChGradRecter extends RecterPlugin {
 
 	var def_base_param_arr = new Array();
 	var def_method = "Rect";
-	var def_ch = true;		// デフォルト
+	var def_ch = false;		// デフォルト
 	var def_ruby = false;
 	var def_edge = false;
 	var def_withRuby = false;

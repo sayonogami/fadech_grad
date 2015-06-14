@@ -159,10 +159,10 @@ class FadeChLayer extends FadeLayer {
 		fillRect(0, 0, imageWidth, imageHeight, 0);		// 領域をクリア
 		face = dfAuto;
 
-		if(rot!="n" || rotMove!="n") cl.fillRect(0, 0, cl.width, cl.height, 0x00000000);
 		cl.width = 8; cl.height = 8;
 		cl.face = dfAuto;
 		cl.type = ltAddAlpha;
+		if(rot!="n" || rotMove!="n") cl.fillRect(0, 0, cl.width, cl.height, 0x00000000);
 
 		slantx = slanty = 0;
 		r_cwh = 0;
@@ -674,10 +674,13 @@ class FadeChLayer extends FadeLayer {
 	function drawGradCh(x, y, text, col, opa=255, aa=true, sl=255, sc=0, ee=0, sofx=0, sofy=0) {
 		GradChLayer.drawTextPlain(x, y, text, col, opa, aa, sl, sc, ee, sofx, sofy);
 
+		// 描画の高速化のため、制約を設ける
 		if(vertical && !flag_hch) {
-			OperateGradationBase(x-font.height, y, font.getTextHeight(text), font.getTextWidth(text), ee, sofx, sofy);
+			OperateGradationBase(x-font.height, y, font.height, font.height, ee, sofx, sofy);
+//			OperateGradationBase(x-font.height, y, font.getTextHeight(text), font.getTextWidth(text), ee, sofx, sofy);
 		} else {
-			OperateGradationBase(x, y, font.getTextWidth(text), font.getTextHeight(text), ee, sofx, sofy);
+			OperateGradationBase(x, y, font.height, font.height, ee, sofx, sofy);
+//			OperateGradationBase(x, y, font.getTextWidth(text), font.getTextHeight(text), ee, sofx, sofy);
 		}
 	}
 
@@ -687,11 +690,11 @@ class FadeChLayer extends FadeLayer {
 		}
 		// 現在までの描画結果を取っておく
 		cl.setSize(this.width, this.height);
-		cl.fillRect(0, 0, cl.width, cl.height, 0x00000000);
+//		cl.fillRect(0, 0, cl.width, cl.height, 0x00000000);
 		cl.copyRect(0, 0, GradChLayer, 0, 0, this.width, this.height);
 
-		// 比較(明)合成で使うので、グラデーションを保持する部分は黒
-		GradChLayer.fillRect(0, 0, this.width, this.height, 0x00000000);
+//		// 比較(明)合成で使うので、グラデーションを保持する部分は黒
+//		GradChLayer.fillRect(0, 0, this.width, this.height, 0x00000000);
 
 		var gColor = col, gEdgeColor = sc;
 		if(ml.chGradObj.ch) { gColor = 0x000000; }
@@ -702,7 +705,7 @@ class FadeChLayer extends FadeLayer {
 		GradChLayer.operateRect(0, 0, cl, 0, 0, this.width, this.height, omLighten, 255); 
 
 		// cl全域をクリア
-		cl.fillRect(0, 0, cl.width, cl.height, 0x00000000);
+//		cl.fillRect(0, 0, cl.width, cl.height, 0x00000000);
 	}
 
 	function OperateGradationBase(x, y, w, h, ee, sofx, sofy) {
