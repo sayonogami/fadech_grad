@@ -1,43 +1,44 @@
-; 
-; @waitfadech
-; 　文字がすべてフェード終了するのを待つ。
-; 　「前行のフェードが終了しないうちに次ページに行ってしまうことを防ぐ。」
-;   ことを目的とします。
-;;    このバージョンでは、以前のバージョンにあったバグ、
-;;        トランジションなどによってフェード中の文字が消えてしまうこと
-;;    は発生しません。
-; 
-; 　行の終わりにあって別の処理が始まる直前のタグ、付属の first.ks なら
-;  [backlay] の直前に置けば動作する。
-; 
-; 　必要な箇所はおそらく [l] [p] [s] [backlay] の直前。
-; 　一つあれば十分なので、マクロ中に
-; ...[l][backlay]...
-; 　のような箇所があれば、
-; ...[waitfadech][l][backlay]...
-; 　で良いです。
-; 
+@macro name="lr"
+	@waitfadech
+	@l
+	@r
+@endmacro
 
-@macro name="ld"
-@waitfadech
-@l
+@macro name="pgt"
+	@waitfadech
+	@p
+	@cm
 @endmacro
 
 @macro name="backlaych"
-@waitfadech
-@backlay
+	@waitfadech
+	@backlay
 @endmacro
 
-@macro name="cmt"
-@cm
+@macro name=transx
+	@stoptrans
+	@eval exp="mp.method = mp.method!==void ? mp.method : (mp.rule!==void ? 'universal' : 'crossfade');"
+	@trans * time=%time|400
+	@wt * canskip=%canskip|true 
 @endmacro
 
 
-; クリック待ちで改行。別に意味は無いです
-@macro name="pgt"
-@ld
-@cmt
+
+; マクロ start_select の定義
+@macro name="start_select"
+@backlaych
+@nowait
+@history output=false
+@current page=back
 @endmacro
 
+; マクロ end_select の定義
+@macro name="end_select"
+@trans method=crossfade time=400
+@wt
+@endnowait
+@history output=true
+@current page=fore
+@endmacro
 
 @return
