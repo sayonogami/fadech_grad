@@ -54,8 +54,8 @@ function KAGWindow_config()
 // scWidth に画面の幅、scHeight に画面の高さをピクセル単位で指定します。
 // 標準的に使われている 640x480 や 800x600 のような画面サイズではないサイズ
 // に設定すると、フルスクリーンにできない場合があります。
-;scWidth = 640;
-;scHeight = 480;
+;scWidth = 800;
+;scHeight = 600;
 
 
 // ◆ 読みとり専用モード
@@ -505,8 +505,8 @@ function MessageLayer_config()
 // す。
 ;ml = 16;  // 左端位置
 ;mt = 16;  // 上端位置
-;mw = 640-32;   // 幅
-;mh = 480-32;   // 高さ
+;mw = 800-32;   // 幅
+;mh = 600-32;   // 高さ
 
 
 // ◆ 自動改行/改ページ
@@ -529,7 +529,7 @@ function MessageLayer_config()
 
 // ◆ 行間
 // 行間を pixel 単位で指定します。
-;defaultLineSpacing = 6; // defstyle タグの linespacing 属性に相当
+;defaultLineSpacing = 12; // defstyle タグの linespacing 属性に相当
 
 // ◆ 字間
 // 字間を pixel 単位で指定します。
