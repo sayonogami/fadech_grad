@@ -1,88 +1,51 @@
+; 最初の一回だけプラグインやマクロを読み込む
 @iscript
 Scripts.execStorage("MessageLayerADV.tjs");
-Scripts.execStorage("SubRoutine2.tjs");
 @endscript
 @call storage="samplemacro.ks"
 ; ↑ マクロ読み込み
 
-@wait time=200
-
-@eval exp="f.bg=''"
-; ↑現在読み込まれている背景を記憶している
-
-; マクロ changebg_and_clear の定義
-@macro name="changebg_and_clear"
-@if exp="mp.storage != f.bg"
-; ↑既に読み込まれている背景と同じならば切り替え処理は行わない
-@eval exp="f.bg = mp.storage"
-@backlaych
-@layopt layer=message0 page=back visible=false
-@trans method=crossfade time=300
-@wt
-@image * layer=base page=back
-@trans method=crossfade time=300
-@wt
-@cm
-@layopt layer=message0 page=back visible=true
-@trans method=crossfade time=300
-@wt
-@endif
+@macro name="傍"
+	@font face="ＭＳ ゴシック" bold=false size=23
+	@setChGradation color="0x228B22,0x006400,0x006400,0xFF0000" method="Rect" recttype=1 ch=false edge
+@endmacro
+@macro name="/傍"
+	@resetfont
+	@resetChGradation
 @endmacro
 
-; マクロ loadbg の定義
-@macro name="loadbg"
-@image * layer=base
-@eval exp="f.bg = mp.storage"
+; 訓点送り仮名
+@macro name="訓仮名"
+	@font size=18
+@endmacro
+@macro name="/訓仮名"
+	@resetfont
 @endmacro
 
-; マクロ start_select の定義
-@macro name="start_select"
-@backlaych
-@nowait
-@history output=false
-@current page=back
-@endmacro
 
-; マクロ end_select の定義
-@macro name="end_select"
-@trans method=crossfade time=400
-@wt
-@endnowait
-@history output=true
-@current page=fore
-@endmacro
-
-*syokai_start|吉里吉里とKAGの紹介 - メニュー
-
-
+*syokai_start|メニュー
 @startanchor
-
 ;* ADD
-; withedge :: なし
-;
 ;@deffont edge=false shadow=false edgecolor=0xff0000 edgeextent=2 edgeemphasis=1024
-@position vertical=true
-@deffont edge color=0xffffff shadow=false edgecolor=0xffffff edgeextent=2 edgeemphasis=2048
-;@deffont face="ＭＳ Ｐ明朝" size=24 bold=false rubyface="ＭＳ ゴシック"
-@deffont face="@ＭＳ Ｐ明朝" size=24 bold rubyface="@ＭＳ ゴシック"
-
-;@deffont edge=false shadow shadowcolor=0xffffff shadowoffsetx=10 shadowoffsety=10
+;@position vertical=true
+@deffont face="ＭＳ Ｐ明朝" size=24 bold=false rubyface="ＭＳ ゴシック" rubysize=12
 @resetfont
-;@setChGradation color="0x0000FF,0xffffff,0xff0000,0xffffff,0x00ff00" method="Rect" recttype=2 withruby withEdge=false
 
-;@setChGradation color="0x0000FF,0x00ffff,0xff00ff,0xff0000" method="Rect" recttype=2
+@deffont  color=0x00ffff shadow=false shadowcolor=0xffffff shadowoffsetx=3 shadowoffsety=3 edge edgecolor=0xffffff edgeextent=2 edgeemphasis=1024
+@setDefaultChGradation color="0xFF0000,0x000000,0xFF0000" method="Rect" recttype=1 ch=false edge ruby
 
-;@setChGradation color="0xFF00ff,0x000000" method="Circle" recttype=1 dir=90 withruby=false withEdge=false eachch ruby=false
+;@font edge color=0xffffff shadow=false edgecolor=0x00ffff edgeextent=2 edgeemphasis=2048
+;@setDefaultChGradation color="0xFF0000,0x000000,0xFFFFFF,0xFFFFFF,0xFFFFFF,0xFFFFFF" method="Circle" ch edge=false withEdge
 
-@setDefaultChGradation color="0xFF0000,0x0000ff" method="Rect" recttype=2 dir=90 edge ch=false
 @resetChGradation
-;@setChGradation color="0xFF0000,0xFF0000,0xffffff,0x00ffff,0x00ffff" method="Rect" recttype=1 dir=45 withruby=true withEdge=false eachch=false ruby
+@resetfont
 
 
 
 ; 背景に画像を読み込み、メッセージレイヤにメニューを描画
 @backlaych
-@loadbg storage="mori" page=back
+@image layer="base" storage="mori" page=back
+
 @current page=back
 
 @cm
@@ -93,14 +56,15 @@ Scripts.execStorage("SubRoutine2.tjs");
 
 [font size=40][r_き]吉[r_り]里吉里とKAGの紹介[resetfont][r]
 [r]
-[link target="*about_kirikiri"]吉里吉里[r_とは]とは[r_は][graph storage="ExQuestion.png" alt="!?"][endlink][r]
+[link target="*about"]吉里吉里[r_とは]とは[r_は][graph storage="ExQuestion.png" alt="!?"][endlink][r]
 ;[link target="*about_kirikiri"]吉里吉里[r_と]と[r_は]は[r_は][graph storage="ExQuestion.png" alt="!?"][endlink][r]
 [link target="*about_kag"]KAGとは[endlink][r]
 [r]
 あいう[r_は]は[r_は][graph storage="das2pt22.png" alt="――"]え[r_は][graph storage="ExQuestion.png" alt="!?"]お[r]
 [r]
 [r]
-[r_あい]あ[r]
+[r_べしみ][graph storage="べしみ"][r]
+此天[訓仮名]ノ[/訓仮名]探女
 [r_あいうえおかきくけこ][ch_あいうえ][r]
 [r_均等割りの起きないあいうえおかきくけこ][ch_あいうえ][r]
 [ch_あいうえ][r]
@@ -124,40 +88,124 @@ Scripts.execStorage("SubRoutine2.tjs");
 ; syokai_start に戻る
 @backlaych
 @layopt layer=message0 page=back visible=false
-@trans method=crossfade time=300
-@wt
+@transx
 @jump target=*syokai_start
 
-
-*about_kirikiri|吉里吉里とは
+*about|
 @cm
 
-@changebg_and_clear storage="mori"
-　吉里吉里は、TJSというスクリプト言語を使っていろいろな事をするためのソフトウェアです。[lr]
-　TJSはJavaとJavaScriptを足して３で割ったような言語で、CやC++に比べれば習得しやすい言語だと思います。[lr]
-　吉里吉里ではこのTJSで本体を制御することにより、さまざまなアプリケーションを作成することができます。[lr]
-　特にマルチメディア系の機能が強く、比較的静的な表現を用いる２Ｄゲームに適しています。[p]
-*about_kirikiri2|
-@cm
-@setChGradation color="0xFF00ff,0x000000" method="Circle" recttype=1 dir=90 withruby=false withEdge=false eachch ruby=false
+@setDefaultChGradation color="0x228B22,0x006400,0x000000" method="Rect" recttype=1 ch=false edge
+@deffont color=0xffffff edge shadow=false edgecolor=0xffffff edgeextent=2 edgeemphasis=2048
+@resetChGradation
 
-　吉里吉里は、レイヤと呼ばれる画面を何枚も重ね合わせて画面を構成します。[l]レイヤはアルファブレンドによる重ね合わせが可能で、階層構造を採ることもできます。[lr]
-　レイヤには標準でPNG/JPEG/ERI/BMPを読み込み可能で、Susie-pluginで読み込み可能な形式を拡張することもできます。[lr]
-　描画はあまり複雑なことはできませんが、半透明矩形の描画やアンチエイリアス可能な文字表示、画像の拡大縮小や変形を行う事ができます。[lr]
-　AVI/MPEGやSWF(Macromedia Flash)をムービーとして再生させることができます。[p]
-*about_kirikiri3|
-@cm
-　吉里吉里ではCD-DA、MIDIシーケンスデータ、PCMを再生させることができ、それぞれ音量調節が可能です。[l]PCMは無圧縮の.WAVファイルのほか、プラグインで再生可能な形式を拡張でき、OggVorbisも再生することができます。[lr]
-　PCMは複数を同時に再生することができます。[l]CD-DAやMIDIシーケンスデータでも無理矢理やろうと思えば複数同時再生できます。[p]
-*about_kirikiri4
-@cm
-　その他、周辺ツールとして、
-複数のファイルを一つにまとめたり、単体で実行可能なファイルを作成することができる[font color=0xffff00]Releaser[resetfont]、[l]
-吉里吉里本体の設定を行う[font color=0xffff00]吉里吉里設定[resetfont]、[l]
-制作者側でフォントを用意し、プレーヤ側にフォントがインストールされて無くても使えるようにする[font color=0xffff00]レンダリング済みフォント作成ツール[resetfont]、[l]
-透明度を持った画像フォーマット間の相互変換を行う[font color=0xffff00]透過画像フォーマットコンバータ[resetfont]があります。[lr]
+@backlaych
+@image layer="base" storage="kawa" page=back
+@transx
+
 [r]
-@start_select
-[link target=*to_syokai_start]メニューに戻る[endlink]
-@end_select
-[s]
+[r]
+@font edgecolor=0xffffff
+@style sxmovemode="valuerandom" sxmove=10 symovemode="random" symove=10 fadetime=1200
+@style align=center
+@font face="ＭＳ Ｐ明朝" size=48
+@setChGradation color="0xFF0000,0x000000,0xFF0000" method="Rect" recttype=1 ch=false edge ruby
+鬼の話
+[r]
+[r]
+[r]
+[r]
+[r]
+折口信夫
+@pgt
+
+;http://www.aozora.gr.jp/cards/000933/files/13214_14432.html
+
+@resetChGradation
+
+
+
+　　　　　一　[傍]おに[/傍]と神と[lr]
+[r]
+「おに」と言ふ[r_ことば]語にも、昔から諸説があつて、今は外来語だとするのが最勢力があるが、[傍]おに[/傍]は正確に「鬼」でなければならないと言ふ用語例はないのだから、わたしは外来語ではないと思うてゐる。さて、日本の古代の信仰の方面では、[傍]かみ[/傍]（神）と、[傍]おに[/傍]（鬼）と、[傍]たま[/傍]（霊）と、[傍]もの[/傍]との四つが、代表的なものであつたから、此等に[r_つい]就て、総括的に述べたいと思ふのである。[lr]
+鬼は怖いもの、神も現今の様に抽象的なものではなくて、もつと[r_かしこ align=l]畏しいものであつた。今日の様に考へられ出したのは、神自身の向上した為である。[傍]たま[/傍]は眼に見え、輝くもので、形はまるいのである。[傍]もの[/傍]は、極抽象的で、姿は考へないのが普通であつた。此は、平安朝に入つてから、勢力が現れたのである。
+
+@pgt
+
+[傍]おに[/傍]は「鬼」といふ漢字に[r_やく]飜された為に、意味も固定して、人の死んだものが鬼である、と考へられる様になつて[r_しも]了うたのであるが、もとは、どんなものを[r_サ]斥して[傍]おに[/傍]と称したのであらうか。[lr]
+現今の神々は、初めは低い地位のものだつたのが、次第に高くなつて行つたので、朝廷から神に位を授けられたことを見ても、此は、明らかである。即、神社の神は階級の低いものであつた。土地の精霊は、土地と関係することが深くなるに連れて、位を授けられる様になつて行つたので、[r_それ]其以前の神と言へば即、[r_とこよのかみ][ch_常世神]だつたのである。
+
+@pgt
+
+常世神とは――此はわたしが仮りに[r_ナヅ]命けた名であるが――海の彼方の常世の国から、年に一度或は数度此国に来る神である。常世神が来る時は、[r_その]其前提として、[r_はら]祓へをする。後に、陰陽道の様式が[r_は]這[r_い]入つてから、祓への前提として、神が現れる様にもなつた。が、常世神は、海の彼方から来るのがほんとうで、此信仰が変化して、山から来る神、空から来る神と言ふ風に、形も変つて行つた。此処に、高天原から降りる神の観念が形づくられて来たのである。今も民間では、神は山の上から来ると考へてゐる処が多い。此等の神は、実は[r_その]其性質が鬼に近づいて来てゐるのである。
+
+@pgt
+
+　　　　　二　祭りに出る[傍]おに[/傍][lr]
+[r]
+春の祭りには、一年中の農作を祝福するのが、普通であつた。其には、其年の農作の豊けさを、仮りに眼前に[r_ほうふつ][ch_髣髴]させようとした。かうした春の農作物祝福の祭りの系統を、[傍]はなまつり[/傍]と言ふ。新・旧正月に通じて、今年の農作はかくの如くある様に、と具体的に示す。[r_この]此春の祭りには、[傍]おに[/傍]が出て来るのだ。[lr]
+[傍]おに[/傍]は、実に訣らぬ怪物である。出雲の杵築の春祭りにも「[r_バンナイ][ch_番内]」といふ[傍]おに[/傍]が出て来る。此は、追儺と一緒になつて了うてゐる。[r_ホシヤ][ch_歩射]の神事には、節分の日昏れ、或は大晦日の日昏れに、馬場などに的を造つて、射ることがある。此を鬼矢来の式と称するが、此は逆で、神の来る式に[傍]おにやらひ[/傍]の式が混入し、村人の[傍]おに[/傍]の信仰が変化して結びつき、こんな矛盾した形が出来たのであらう。
+
+@pgt
+
+社々で行はれてゐる神楽には、鬼が現れてする問答がある。鬼が言ひまかされて逃げて行く処が、神楽の大事な部分である。此考へは、追儺の式と同じであるが、これにも矛盾が沢山ある。歳神と言ふのは、毎年春の初めに、空か山の上かゝら来る神で、年の暮れに村人が歳神迎へに行く。其時には、山の中の神の宿る木を見つけて、其木に神の魂を載せて帰る。かうした意味で、門松の行事の行はれてゐる地方が、沢山ある。此時神は、門松に唯一人で載つて来るのではなくて、大勢眷属を率ゐて来るのである。かうした神を祀る処は歳棚で、歳棚の供物には、鏡餅・[r_シトギ]粢・握り飯等があるが、皆魂の象徴であつたのだ。其数は、平年には十二、閏年には十三である。此は、神の眷属は大勢あるが、一个月に一人づゝ来るものと見て、此習慣が出来たのであらう。
+
+@pgt
+
+信州下伊那郡｜[r_ニヒノ][ch_新野]では、正月十三日か十四日に、門松と一緒に立てかけておいた[傍]にうぎ[/傍]を、をがみ場所に配つて歩く。此を[傍]おにき[/傍]と言ふ。其頃はちようど、歳神を送る日に当るが、其日には鬼が来ると称し、針為事を控へる。此処では歳神は鬼と似た性質を持つてゐて、やはり、眷属を連れて来る。[lr]
+此と同様な事は、盆にもする。盆棚は事実、歳神の棚と同じ意味でする地方がある。精霊・[傍]わき[/傍]・[傍]とも[/傍]と、それ／″＼区別して、棚を拵へることもする。盆の変つた行事としては、生御霊の行事がある。其は、大きな家の子方に当る人々は、盆の間に其親方の家に挨拶に行く。大きな[r_サバ]鯖を携へて行き、親方の為に[傍]おめでたごと[/傍]を述べるのである。
+
+@pgt
+
+此式は室町頃から続いたことで、田舎から京へ出たのだらうと思ふ。正月に朝覲行幸をせられるのも、実は此生御霊と同様な行事である。此信仰はすべて、吾々は生御霊を持つてゐるといふ考へから出たもので、吾々の身体から生御霊は離れよう／＼とし、或は外物に誘はれて、出よう／＼としてゐるのを、抑へなくてはならない。子方は親方の生御霊を抑へに行くのであり、祝福しに行くのである。今に用ゐる正月の「おめでたう」といふ挨拶は、其祝福の詞の固定したものである。其にしても、何故｜[r_サバ]鯖を携へて行くのかは、訣らない。一体、神に捧げる食物と、精霊に捧げる食物とは異つてゐて、精霊に捧げるのを[r_サバ][ch_産飯]と言ふが、其語が鯖に考へられたのではなからうか。後期王朝には、生御霊と死御霊と二つあつた。死御霊は常に、生御霊を誘ひ出さうとする。[lr]
+琉球の石垣島の盆の祭りには、沢山の精霊が出て来た。即、[傍]おしまひ[/傍]（爺）・[傍]あつぱあ[/傍]（婆）が多くの眷属をひきつれて現れ、家々を廻つて、祝福をして歩く。此群を[傍]あんがまあ[/傍]と言ひ、大倭から来るものと考へてゐるが、其は海の彼方の理想郷からであらう。
+
+@pgt
+
+春の初めの清明節には、[傍]まやの神[/傍]と言ふ神が現れる。此は台湾の蕃人も持つてゐる信仰である。[傍]まや[/傍]は即[傍]まやの国[/傍]から来る神で、簑笠で顔を[r_つつ]裹んで来て、やはり、家々を祝福して廻る。[r_メイラ][ch_宮良]村には、海岸に[傍]なびんづう[/傍]と言ふ洞穴があつて、[傍]黒また[/傍]・[傍]赤また[/傍]と称する二人の神が現れる。[傍]また[/傍]は蛇のことである。此神は、顔には[r_メン]面を被り、体は蔓で飾り、二神揃つて踊れば、村の若者も此を中心にして踊り出す。此時、若者は、若者になる洗礼を受けるのだから、成年戒の意味も含まれてゐるのである。[lr]
+かうした神々の来臨は、曾て、水葬せられた先祖の霊が一処に集合してゐて、其処から来るのである、と考へたものらしく、此等の神は、非常に恐れられてゐるのを見ても、古い意味を持つてゐるのである。簑笠を著けて家に入ることの出来るのは、神のみであるから、中でも、[傍]あんがまあ[/傍]と言ふ祖先の霊の出る祭りは、最古い意味を持つてゐるものと思はれる。其が、盆の行事と結合して、遺つてゐるのであらう。
+
+@pgt
+
+此信仰の源は一つであるが、三様に岐れてゐる。内地の例に当てゝ見れば、よく訣ることで、最初の考へは、死霊の来ることである。此死霊をはつきり伝へた村と、祝福に来る常世神の信仰を持ち続けた村とがある。内地では此観念が変つて、山或は空から来るものと考へる様になつてゐる。[lr]
+歳神は、祖先の霊が一个年間の農業を祝福しに来るので、此を迎へる為に歳棚を作るのであるが、今は門松ばかりを樹てるやうになつて了うた。多くの眷属を伴つて来るので、随つて供物も沢山供へる。その供物自身が神の象徴なのである。古い信仰では、餅・握り飯は魂の象徴であつた。だから、餅が白鳥になつて飛ぶ事の訣もわかるのである。白鳥はもとより、魂の象徴である。[lr]
+神が大勢眷属を連れて来るのは、群行の様式である。仮装の古いものに[r_フリウ][ch_風流]があり、仏教味が加はつて[r_レンダウ][ch_練道]となるが、源は皆一つで、神の行列である。初春に神の群行があるのは固有であるが、盆に来るのは、仏教と融合してゐる。徒然草に、東国では大晦日の晩に魂祭りをしたことが見える。歳神と同じであり、更に初春に来る鬼である。
+
+@pgt
+
+
+　　　　　三　土地の精霊と常世神と[lr]
+[r]
+　　まきむくの穴師の山の山人と、人も見るかに、山かつらせよ[lr]
+[r]
+古今集巻二十に、かういふ歌がある。柳田国男先生が古今集以前に、既に、此風はあつたらしい、と言つて居られる通り、大嘗祭には、日本中の出来るだけ多くの民族が出て来たもので、穴師山の山人も其一つなのである。即、土地の神々が、祭りに参与すると言ふ考へが、かうした[傍]しきたり[/傍]を産んだのである。彼等は、彼等の神の代表者として来り加はり、神と精霊と問答をし、結局、精霊が負けると言ふ行事をすることになつて居たのだ。
+
+@pgt
+
+此形は、[傍]あまんじやく[/傍]が何でも人に反対すると言ふ事に残つてゐる。[傍]あまんじやく[/傍]は即、土地の精霊で、日本紀には、[r_アマ]天[訓仮名]ノ[/訓仮名][r_サグメ][ch_探女]として其話があり、古事記や万葉集にも見える。やはり、何にでも邪魔を入れる、といふ名まへであらう。神々が土地を開拓しようとする時、邪魔をするのは、何時も天[訓仮名]ノ[/訓仮名]探女である。即、土地の精霊なのである。此天[訓仮名]ノ[/訓仮名]探女は、実に日本芸術の発足の源をなしてゐるものである。其為事は、[lr]
+[r]
+　　一　ものまね→芸能（舞踊）[lr]
+　　一　人に反対すること→狂言（おどけ）[lr]
+[r]
+
+即、日本の芸術、尠くとも演芸の発生を為すものである。狂言は、江戸に入つて初めて勢力が出た。[傍]ものまね[/傍]とは、ちようど反対の立場にある。
+
+@pgt
+
+猿楽では[傍]をかし[/傍]といひ、延年舞では[傍]もどき[/傍]と称して、所謂[傍]もどき開口[/傍]の儀式をする者がある。[傍]もどき[/傍]が、殊に有力な働きをするのは田楽で、随つて寺院の舞踊に這入つてゐる。[傍]ひよつとこ[/傍]は、その最近くまで残つた形である。[傍]もどき[/傍]は即「もどく」意で、反対する事を現す。日本の芸術では、歌の掛け合ひから既に[傍]もどき[/傍]である。神と精霊との問答が、歌垣となつたのである。源に溯ると、あらゆる方面に[傍]もどき[/傍]が現れてゐる。[lr]
+能楽の面に[r_オホ]大[r_ベシミ][graph storage="べしみ"]と言ふのがあるが、[r_ベシミ][graph storage="べしみ"]は「へしむ」といふ動詞から出た名詞で、口を拗り曲げてゐる様である。神が土地の精霊と問答する時、精霊は容易に口を開かない。尤、物を言はない時代を越すと、口を開くやうにもなつたが、返事をせないか、或は反対ばかりするかであつて、此二つの方面が、[r_オホ]大[r_ベシミ][graph storage="べしみ"]の面に現れてゐるのだ。一体日本には、古くから面のあつたことを示す証拠はある。併し、外来の面が急速に発達した為、在来の面は、其影を潜めたのである。
+
+@pgt
+
+開口は、口を無理に開かせて返事をさせる事で、其を司る者は脇役である。[傍]して[/傍]は神で、[傍]わき[/傍]は其相手に当る。かうした[傍]わき[/傍]の為事が分化して来ると、狂言になるのだ。勿論、狂言は、能楽以前からあつたものである。[r_オホ]大[r_ベシミ][graph storage="べしみ"]の面は、全く口を閉ぢてゐる貌であるが、此面には、尊い神の命令を聴くと言ふ外に、其命令を伝達すると言ふ、二つの意味がある。即、神であり、[傍]おに[/傍]であるのだ。[lr]
+また一方、恐怖の方面のみを考へたのが、鬼となつた。鬼と言ふ語は、仏教の羅卒と混同して、[r_ゴヅ][ch_牛頭]・[r_メヅ][ch_馬頭]の様に想像せられてしまうた。其以前の鬼は、常世神の変態であるのだが、次弟に変化して、初春の鬼は、全く羅卒の如きものと考へられたのである。つまり、初めは神が出て来て、鬼を屈服させて行くのだが、後には、神と鬼との両方面を、鬼がつとめることになつて行つた。鬼が相手方に移つて行つたのである。田楽では、鬼と天狗とを扱うてゐる。一体、田楽は宿命的に、天狗と鬼とを結合させてゐる。此は演劇の発足を示すもので、初めは[傍]して[/傍]が鬼、[傍]わき[/傍]が[傍]もどき[/傍]であつた。
+
+@pgt
+
+村々の大切な儀式に鬼が参加することは、今も、処々に残つてゐる重大なことである。壱岐の島へ行くと、[傍]おにや[/傍]と言ふものがあるが、此は古墳に相違ない。此処には昔、鬼が棲んだと言はれてゐる。対馬へ行くと、[傍]やぼさ[/傍]と言ふ場所が神聖視せられてゐる。初春には、殊に大切に取り扱はねばならぬ。此処には、祖先の最古い人が住んでゐると考へられ、非常に恐れられてゐる。[lr]
+昔は、海辺の洞穴に死人を葬つたが、後には其処を神の通ひ場所と考へる様になつた。沖縄の[r_イシガキ][ch_石垣]島の[r_メイラ][ch_宮良]村では、[傍]なびんづう[/傍]の[r_オニヤ][ch_鬼屋]に十三年目毎に這入つて行つて、若衆入りの儀式を挙げる。恐るべき鬼は、時には、親しい懐しい心持ちの鬼でもある。仏教で言ふ鬼では決してないのである。
+
+@pgt
+
+かうした鬼を扱ふ方法を、昔の人々はよく知つてゐた。[傍]あるじ[/傍]と言ふ語は、[傍]まれびと[/傍]即、常世神に対する馳走を意味する。日本の宴会には後世まで、古代の神祭りの儀式のなごりが、沢山遺つてゐる。武家の間で馳走の時、[傍]おに[/傍]と言ふ名の役が出た事も、かうして見て初めて意味がよく訣る。[lr]
+[傍]まれびと[/傍]なる鬼が来た時には、出来る限りの款待をして、悦んで帰つて行つてもらふ。此場合、神或は鬼の去るに対しては、なごり惜しい様子をして送り出す。即、村々に取つては、よい神ではあるが、長く滞在されては困るからである。だから、次回に来るまで、再、戻つて来ない様にするのだ。かうした神の観念、鬼の考へが、天狗にも同様に変化して行つたのは、田楽に見える処である。
+
