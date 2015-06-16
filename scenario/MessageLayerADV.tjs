@@ -536,7 +536,7 @@ class MessageLayerADV extends MessageLayer {
 			var dr_y = set_cy(0);
 
 // TODO : shadow
-dm("initChLayer : " + in_x, in_y, in_w, in_h);
+// dm("initChLayer : " + in_x, in_y, in_w, in_h);
 
 			.initChLayer(in_x, in_y, in_w, in_h);
 
@@ -1256,6 +1256,8 @@ class ChGradRecter extends RecterPlugin {
 	/			デフォルトでtrue
 	*/
 	function setChGrad(elm) {
+		comp_param = %[];
+
 		base_param_arr.assign(elm);
 		method = elm.method!==void ? elm.method : def_method;
 
@@ -1270,6 +1272,8 @@ class ChGradRecter extends RecterPlugin {
 	}
 
 	function setDefaultChGrad(elm) {
+		comp_param = %[];
+
 		def_base_param_arr.assign(elm);
 		def_method = elm.method if elm.method !== void;
 
@@ -1341,14 +1345,13 @@ class ChGradRecter extends RecterPlugin {
 		}
 
 		with(comp_param) {
-			redraw = (.color===elm.color && .method===elm.method && .ropa===elm.ropa
-				 && .width===elm.width && .height===elm.height
-				 && .x===elm.x && .y===elm.y && .w===elm.w && .h===elm.h
+			redraw = (.width==elm.width && .height==elm.height
+				 && .x==elm.x && .y==elm.y && .w==elm.w && .h==elm.h
 				) ? redraw : true;
 
 			switch(method) {
 				case 'Rect':
-					redraw = (.recttype===elm.recttype && .dir===elm.dir) ? redraw : true;
+			//		redraw = (.recttype===elm.recttype && .dir===elm.dir) ? redraw : true;
 				break;
 				case 'Circle':
 					redraw = (.r===elm.r) ? redraw : true;

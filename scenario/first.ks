@@ -26,17 +26,17 @@ Scripts.execStorage("MessageLayerADV.tjs");
 *syokai_start|ÉÅÉjÉÖÅ[
 @startanchor
 ;* ADD
-;@deffont edge=false shadow=false edgecolor=0xff0000 edgeextent=2 edgeemphasis=1024
-@position vertical=true
-@deffont face="@ÇlÇr Çoñæí©" size=24 bold=false rubyface="@ÇlÇr ÉSÉVÉbÉN" rubysize=12
-;@deffont face="ÇlÇr Çoñæí©" size=24 bold=false rubyface="ÇlÇr ÉSÉVÉbÉN" rubysize=12
+;@position vertical=true
+;@deffont face="@ÇlÇr Çoñæí©" size=24 bold=false rubyface="@ÇlÇr ÉSÉVÉbÉN" rubysize=12
+@deffont face="ÇlÇr Çoñæí©" size=24 bold=false rubyface="ÇlÇr ÉSÉVÉbÉN" rubysize=12
 @resetfont
 
-@deffont  color=0x0000ff shadow=false shadowcolor=0xffffff shadowoffsetx=3 shadowoffsety=3 edge edgecolor=0xffffff edgeextent=2 edgeemphasis=1024
-@setDefaultChGradation color="0xFF0000,0xFF0000,0xFF0000,0xFFFFFF,0xFF0000,0xFF0000,0xFF0000" method="Rect" recttype=2 ch=false edge eachch=false
+
+@deffont color=0x0000ff shadow=false shadowcolor=0xffffff shadowoffsetx=3 shadowoffsety=3 edge edgecolor=0xffffff edgeextent=2 edgeemphasis=1024
+@setDefaultChGradation color="0xFF0000,0xFF0000,0xFF0000,0xFFFFFF,0xFF0000,0xFF0000,0xFF0000" method="Rect" recttype=2 ch=false edge
 
 ;@font edge color=0xffffff shadow=false edgecolor=0x00ffff edgeextent=2 edgeemphasis=2048
-;@setDefaultChGradation color="0xFF0000,0x000000,0xFFFFFF,0xFFFFFF,0xFFFFFF,0xFFFFFF" method="Circle" ch edge=false withEdge
+;@setDefaultChGradation color="0xFFFFFF,0xFF0000,0xFFFFFF,0xFFFFFF,0xFFFFFF,0xFFFFFF,0xFFFFFF" method="Circle" ch=false edge withEdge
 
 @resetChGradation
 @resetfont
@@ -55,14 +55,13 @@ Scripts.execStorage("MessageLayerADV.tjs");
 @history output=false
 @style align=center
 
-[font size=40][r_Ç´]ãg[r_ÇË]ó¢ãgó¢Ç∆KAGÇÃè–âÓ[resetfont][r]
+[font size=70][r_Ç´]ãg[r_ÇË]ó¢ãgó¢Ç∆KAGÇÃè–âÓ[resetfont][r]
 [r]
 [link target="*about"]ãgó¢ãgó¢[r_Ç∆ÇÕ]Ç∆ÇÕ[r_ÇÕ][graph storage="ExQuestion.png" alt="!?"][endlink][r]
 ;[link target="*about_kirikiri"]ãgó¢ãgó¢[r_Ç∆]Ç∆[r_ÇÕ]ÇÕ[r_ÇÕ][graph storage="ExQuestion.png" alt="!?"][endlink][r]
-[link target="*about_kag"]KAG±≤≥¥µﬂ[ch text="KAG$"]Ç∆ÇÕ[endlink][r]
+[link target="*about_kag"]KAGÅ\±≤≥¥µﬂ[ch text="KAG$"]Ç∆ÇÕ[endlink][r]
 [r]
 Ç†Ç¢Ç§[r_ÇÕ]ÇÕ[r_ÇÕ][graph storage="das2pt22.png" alt="Å\Å\"]Ç¶[r_ÇÕ][graph storage="ExQuestion.png" alt="!?"]Ç®[r]
-[r]
 [r]
 [r_Ç◊ÇµÇ›][graph storage="Ç◊ÇµÇ›"][r]
 çüìV[åPâºñº]Ém[/åPâºñº]íTèóÅE
@@ -94,6 +93,9 @@ Scripts.execStorage("MessageLayerADV.tjs");
 
 *about|
 @cm
+
+;@setDefaultChGradation color="0x228B22,0x006400,0x000000" method="Rect" recttype=1 ch=false edge=false
+;@deffont color=0xffffff edge shadow=false edgecolor=0x000000 edgeextent=2 edgeemphasis=2048
 
 @setDefaultChGradation color="0x228B22,0x006400,0x000000" method="Rect" recttype=1 ch=false edge
 @deffont color=0xffffff edge shadow=false edgecolor=0xffffff edgeextent=2 edgeemphasis=2048

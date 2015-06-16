@@ -4,8 +4,6 @@
 / 
 / メッセージレイヤで文字をフェード表示させるためのレイヤ
 /
-/ メモ：縦書き時でShift-JIS依存のコードがあるので、Zへの移植時には注意すること
-/
 / 親文字字間拡張機能 (ルビ長が親文字より長い際に親文字の字間を広げる機能)
 / 　均等割り付け( align="e" )時にのみ処理が行われる
 / ※ルビ長が親文字より長い際に親文字の字間を広げる機能、における改行について
@@ -17,7 +15,8 @@
 / そのため、ルビと親文字の文字数によっては文字が右端(縦書きなら下端)にはみ出て
 / しまう可能性がある。チェックし、手動で改行処理をすること。
 / 
-/ 
+/ メモ：縦書きGrad時にShift-JIS依存のコードを付けようか迷い中。
+/       Zへの移植時には注意すること
 /----------------------------------------------------------------------------*/
 @if(__FADECHLAYER_DEFINED__==0)
 @set(__FADECHLAYER_DEFINED__=1)
@@ -701,36 +700,34 @@ class FadeChLayer extends FadeLayer {
 
 		// 描画の高速化のため、生成するグラデの大きさには制約を設ける
 		var tw = font.getTextWidth(text);
-
+		var min_WH = tw;
 
 		if(vertical && !flag_hch) {
-			// Shift-JISのみ
-			if(text.length==1 & text<='ﾟ' & '!'<=text ) {
-				// アルファベットなどは横向きに表示されるので、縦仕様で表現。
-				tw = font.getTextHeight(text);
+//			// Shift-JISのみ - 要らない？
+//			if(text.length==1 & text<='ﾟ' & '!'<=text ) {
+//				// アルファベットなどは横向きに表示されるので、縦仕様で表現。
+//				tw = font.getTextHeight(text);
+//			}
+			if(min_WH < font.height) {	// 細長い文字のとき
+				min_WH = font.height;
+				y -= (min_WH-tw)/2;
 			}
-
-			r_ch = tw;
-			if(r_ch < font.height) {	// 細長い文字のとき
-				r_ch = font.height;
-				x -= (r_ch-tw)/2;
-			}
-
-			OperateGradationBase(x-font.height, y, font.height, r_ch, ee, sofx, sofy);
+			OperateGradationBase(x-font.height, y, font.height, min_WH, ee, sofx, sofy);
 		} else {
-			r_cw = tw;
-			if(r_cw < font.height) {	// 細長い文字のとき
-				r_cw = font.height;
-				x -= (r_cw-tw)/2;
+			if(min_WH < font.height) {	// 細長い文字のとき
+				min_WH = font.height;
+				x -= (min_WH-tw)/2;
 			}
-			OperateGradationBase(x, y, r_cw, font.height, ee, sofx, sofy);
+			OperateGradationBase(x, y, min_WH, font.height, ee, sofx, sofy);
 		}
 	}
 
 	function restrictGradEffectOnChAndEdge(x, y, text, col, opa=255, aa=true, sl=255, sc=0, ee=0, sofx=0, sofy=0) {
-		if(sc === 0x000000 && col === 0x000000) {
-			return;
-		}
+		// 特殊なケース。不要。
+//		if(sc === 0x000000 && col === 0x000000) {
+//			return;
+//		}
+
 		// グラデ画像はグラデを掛けないところが黒くなっているので
 		// グラデを掛けたいところだけを黒にした文字と比較(明)合成することで
 		// 確実にグラデとその他の色が合成される
