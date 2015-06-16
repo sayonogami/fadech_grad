@@ -27,12 +27,13 @@ Scripts.execStorage("MessageLayerADV.tjs");
 @startanchor
 ;* ADD
 ;@deffont edge=false shadow=false edgecolor=0xff0000 edgeextent=2 edgeemphasis=1024
-;@position vertical=true
-@deffont face="‚l‚r ‚o–¾’©" size=24 bold=false rubyface="‚l‚r ƒSƒVƒbƒN" rubysize=12
+@position vertical=true
+@deffont face="@‚l‚r ‚o–¾’©" size=24 bold=false rubyface="@‚l‚r ƒSƒVƒbƒN" rubysize=12
+;@deffont face="‚l‚r ‚o–¾’©" size=24 bold=false rubyface="‚l‚r ƒSƒVƒbƒN" rubysize=12
 @resetfont
 
-@deffont  color=0x00ffff shadow=false shadowcolor=0xffffff shadowoffsetx=3 shadowoffsety=3 edge edgecolor=0xffffff edgeextent=2 edgeemphasis=1024
-@setDefaultChGradation color="0xFF0000,0x000000,0xFF0000" method="Rect" recttype=1 ch=false edge ruby
+@deffont  color=0x0000ff shadow=false shadowcolor=0xffffff shadowoffsetx=3 shadowoffsety=3 edge edgecolor=0xffffff edgeextent=2 edgeemphasis=1024
+@setDefaultChGradation color="0xFF0000,0xFF0000,0xFF0000,0xFFFFFF,0xFF0000,0xFF0000,0xFF0000" method="Rect" recttype=2 ch=false edge eachch=false
 
 ;@font edge color=0xffffff shadow=false edgecolor=0x00ffff edgeextent=2 edgeemphasis=2048
 ;@setDefaultChGradation color="0xFF0000,0x000000,0xFFFFFF,0xFFFFFF,0xFFFFFF,0xFFFFFF" method="Circle" ch edge=false withEdge
@@ -58,14 +59,14 @@ Scripts.execStorage("MessageLayerADV.tjs");
 [r]
 [link target="*about"]‹g—¢‹g—¢[r_‚Æ‚Í]‚Æ‚Í[r_‚Í][graph storage="ExQuestion.png" alt="!?"][endlink][r]
 ;[link target="*about_kirikiri"]‹g—¢‹g—¢[r_‚Æ]‚Æ[r_‚Í]‚Í[r_‚Í][graph storage="ExQuestion.png" alt="!?"][endlink][r]
-[link target="*about_kag"]KAG‚Æ‚Í[endlink][r]
+[link target="*about_kag"]KAG±²³´µß[ch text="KAG$"]‚Æ‚Í[endlink][r]
 [r]
 ‚ ‚¢‚¤[r_‚Í]‚Í[r_‚Í][graph storage="das2pt22.png" alt="\\"]‚¦[r_‚Í][graph storage="ExQuestion.png" alt="!?"]‚¨[r]
 [r]
 [r]
 [r_‚×‚µ‚İ][graph storage="‚×‚µ‚İ"][r]
-Ÿ“V[ŒP‰¼–¼]ƒm[/ŒP‰¼–¼]’T—
-[r_‚ ‚¢‚¤‚¦‚¨‚©‚«‚­‚¯‚±][ch_‚ ‚¢‚¤‚¦][r]
+Ÿ“V[ŒP‰¼–¼]ƒm[/ŒP‰¼–¼]’T—E
+[r_‚ ‚¢‚¤‚¦‚¨‚©‚«‚­‚¯‚±][ch_‚ [‚¢[‚¤[‚¦][r]
 [r_‹Ï“™Š„‚è‚Ì‹N‚«‚È‚¢‚ ‚¢‚¤‚¦‚¨‚©‚«‚­‚¯‚±][ch_‚ ‚¢‚¤‚¦][r]
 [ch_‚ ‚¢‚¤‚¦][r]
 [r]
