@@ -6,7 +6,7 @@ Scripts.execStorage("MessageLayerADV.tjs");
 ; ↑ マクロ読み込み
 
 @macro name="傍"
-	@font face="ＭＳ ゴシック" bold=false size=23
+	@font face="ＭＳ ゴシック" bold=false size=23 color=0xffffff
 	@setChGradation color="0x228B22,0x006400,0x006400,0xFF0000" method="Rect" recttype=1 ch=false edge
 @endmacro
 @macro name="/傍"
@@ -32,8 +32,8 @@ Scripts.execStorage("MessageLayerADV.tjs");
 @resetfont
 
 
-@deffont color=0x0000ff shadow=false shadowcolor=0xffffff shadowoffsetx=3 shadowoffsety=3 edge edgecolor=0xffffff edgeextent=2 edgeemphasis=1024
-@setDefaultChGradation color="0xFF0000,0xFF0000,0xFF0000,0xFFFFFF,0xFF0000,0xFF0000,0xFF0000" method="Rect" recttype=2 ch=false edge
+@deffont color=0xffffff shadow=false shadowcolor=0xffffff shadowoffsetx=3 shadowoffsety=3 edge edgecolor=0xffffff edgeextent=2 edgeemphasis=1024
+;@setDefaultChGradation color="0xFF0000,0xFF0000,0xFF0000,0xFFFFFF,0xFF0000,0xFF0000,0xFF0000" method="Rect" recttype=2 ch=false edge
 
 ;@font edge color=0xffffff shadow=false edgecolor=0x00ffff edgeextent=2 edgeemphasis=2048
 ;@setDefaultChGradation color="0xFFFFFF,0xFF0000,0xFFFFFF,0xFFFFFF,0xFFFFFF,0xFFFFFF,0xFFFFFF" method="Circle" ch=false edge withEdge
@@ -55,21 +55,36 @@ Scripts.execStorage("MessageLayerADV.tjs");
 @history output=false
 @style align=center
 
-[font size=70][r_き]吉[r_り]里吉里とKAGの紹介[resetfont][r]
+@setChGradation color="0xFF0000,0xFF0000,0xFF0000,0xFFFFFF,0xFF0000,0xFF0000,0xFF0000" method="Rect" recttype=1 ch=false edge
+[font size=40]FadeChGradationの紹介[resetfont][r]
 [r]
-[link target="*about"]吉里吉里[r_とは]とは[r_は][graph storage="ExQuestion.png" alt="!?"][endlink][r]
-;[link target="*about_kirikiri"]吉里吉里[r_と]と[r_は]は[r_は][graph storage="ExQuestion.png" alt="!?"][endlink][r]
-[link target="*about_kag"]KAG―ｱｲｳｴｵﾟ[ch text="KAG$"]とは[endlink][r]
+
+@font edge edgecolor=0x000000
+@setChGradation color="0xFF0000,0x00FFFF,0x000000" method="Circle" ch edge=false
+[link target="*about"]サンプルを見る[endlink][r]
+たとえば→graphで[graph storage="ExQuestion.png" alt="!?"]したり文字で[ch_!?]したり[r]
 [r]
-あいう[r_は]は[r_は][graph storage="das2pt22.png" alt="――"]え[r_は][graph storage="ExQuestion.png" alt="!?"]お[r]
+
+@setDefaultChGradation color="0x228B22,0x006400,0x000000" method="Rect" recttype=1 ch=false edge
+@deffont color=0xffffff edge shadow=false edgecolor=0xffffff edgeextent=2 edgeemphasis=2048
+@resetChGradation
+@resetfont
+
+@style align=left
+　[傍][r_・]あ[r_・]ま[r_・]ん[r_・]じ[r_・]や[r_・]く[/傍]は[r_すなわち]即、土地の精霊で、日本紀には、[r_アマ]天[訓仮名]ノ[/訓仮名][r_サグメ][ch_探女]として其話があり、古事記や万葉集にも見える。[r]
+
+　やはり、何にでも邪魔を入れる、といふ名ま[r_え]へであらう。[r]
+
+　神々が土地を開拓しようとする時、邪魔をするのは、何時も天[訓仮名]ノ[/訓仮名]探女である。[r_すなわち]即、土地の精霊なのである。[r]
+
+　[r_この]此天[訓仮名]ノ[/訓仮名]探女は、実に日本芸術の発足の源をなして[r_イ]ゐるものである。
+@style align=center
 [r]
-[r_べしみ][graph storage="べしみ"][r]
-此天[訓仮名]ノ[/訓仮名]探女・
-[r_あいうえおかきくけこ][ch_あーいーうーえ][r]
-[r_均等割りの起きないあいうえおかきくけこ][ch_あいうえ][r]
-[ch_あいうえ][r]
 [r]
-[link exp="kag.shutdown()" color=0xff0000 hint="吉里吉里/KAGの紹介を終了します"]終了[endlink]
+[r]
+@font bold edge edgecolor=0x00FF00
+@setChGradation color="0xFF0000,0xFF0000,0xFF0000,0xFFFFFF,0x0000FF,0x0000FF,0x0000FF" method="Rect" recttype=3 dir=45 ch edge=false
+[link exp="kag.shutdown()" color=0xff0000 hint="吉里吉里/KAGの紹介を終了します"]★終了★[endlink]
 @endnowait
 @history output=true
 @current page=fore
