@@ -880,7 +880,6 @@ class MessageLayerADV extends MessageLayer {
 		if(elm.rcolor == 'default')			r_ChColor = r_DefaultChColor;
 		else if(elm.rcolor !== void)		r_ChColor = elm.rcolor;
 
-
 		if(elm.rubyalign == 'default')		rubyAlign = defaultRubyAlign;
 		else if(elm.rubyalign !== void)		rubyAlign = elm.rubyalign;
 
@@ -894,6 +893,8 @@ class MessageLayerADV extends MessageLayer {
 	}
 
 	function setDefaultFont(elm) {
+		super.setDefaultFont(elm);
+
 		// デフォルトフォントの設定
 		defaultEdgeExtent = +elm.edgeextent if elm.edgeextent !== void;
 		defaultEdgeEmphasis = +elm.edgeemphasis if elm.edgeemphasis !== void;
@@ -902,16 +903,25 @@ class MessageLayerADV extends MessageLayer {
 		defaultRubyAlign = elm.rubyalign if elm.rubyalign !== void;
 		defaultRubyOverflow = elm.rubyoverflow if elm.rubyoverflow !== void;
 		defaultHchCorrect = +elm.hchcorrect if elm.hchcorrect !== void;
-		r_DefaultFace = elm.rubyface if elm.rubyface !== void;
-		r_DefaultBold = +elm.rbold if elm.rbold !== void;
-		r_DefaultChColor = +elm.rcolor if elm.rcolor !== void;
-		r_DefaultShadowColor = +elm.rshadowcolor if elm.rshadowcolor !== void;
-		r_DefaultEdgeColor = +elm.redgecolor if elm.redgecolor !== void;
 
-		super.setDefaultFont(elm);
+		if(elm.setruby) {
+			r_DefaultFace = elm.rubyface if elm.rubyface !== void;
+			r_DefaultBold = +elm.rbold if elm.rbold !== void;
+			r_DefaultChColor = +elm.rcolor if elm.rcolor !== void;
+			r_DefaultShadowColor = +elm.rshadowcolor if elm.rshadowcolor !== void;
+			r_DefaultEdgeColor = +elm.redgecolor if elm.redgecolor !== void;
+		} else {
+			r_DefaultFace = defaultFace;
+			r_DefaultBold = defaultBold;
+			r_DefaultChColor = defaultChColor;
+			r_DefaultShadowColor = defaultShadowColor;
+			r_DefaultEdgeColor =defaultEdgeColor;
+		}
 	}
 
 	function setStyle(elm) {
+		super.setStyle(elm);
+
 		ch4Fade = elm.fade if elm.fade !== void;
 		chfadetime = +elm.fadetime if elm.fadetime !== void;
 
@@ -946,11 +956,11 @@ class MessageLayerADV extends MessageLayer {
 		chSxMove = +elm.sxmove if elm.sxmove !== void;
 		chSyMoveMode = elm.symovemode if elm.symovemode !== void;
 		chSyMove = +elm.symove if elm.symove !== void;
-
-		super.setStyle(elm);
 	}
 
 	function setDefaultStyle(elm) {
+		super.setDefaultStyle(elm);
+
 		// デフォルトのスタイルの設定
 		// オプション設定なので「書かなかったら無し」
 		// ただし keepaddition が指定されてると、上書きしない限り前回指定したものをそのまま使う
@@ -1007,11 +1017,11 @@ class MessageLayerADV extends MessageLayer {
 			elm.symovemode : (elm.keepaddition ? defaultChSyMoveMode : "none");
 		defaultChSyMove = elm.symove !== void ? 
 			+elm.symove : (elm.keepaddition ? defaultChSyMove : void);
-
-		super.setDefaultStyle(elm);
 	}
 
 	function resetStyle() {
+		super.resetStyle();
+
 		// スタイルのリセット
 		ch4Fade = defaultCh4Fade;
 		chfadetime = defaultChfadetime;
@@ -1045,12 +1055,11 @@ class MessageLayerADV extends MessageLayer {
 		chSxMove = defaultChSxMove;
 		chSyMoveMode = defaultChSyMoveMode;
 		chSyMove = defaultChSyMove;
-
-		super.resetStyle();
 	}
 
 	function internalAssign(src, copyvisiblestate) {
 		super.internalAssign(...);
+
 		defaultCh4Fade = src.defaultCh4Fade;			ch4Fade = src.ch4Fade;
 		defaultChfadetime = src.defaultChfadetime;	chfadetime = src.chfadetime;
 
@@ -1158,6 +1167,8 @@ class MessageLayerADV extends MessageLayer {
 	}
 
 	function restore(dic) {
+		super.restore(dic);
+
 		defaultCh4Fade = dic.defaultCh4Fade if dic.defaultCh4Fade !== void;
 		ch4Fade = dic.ch4Fade if dic.ch4Fade !== void;
 		defaultChfadetime = dic.defaultChfadetime if dic.defaultChfadetime !== void;
@@ -1231,7 +1242,6 @@ class MessageLayerADV extends MessageLayer {
 
 		rubyAlign = dic.rubyAlign;	defaultRubyAlign = dic.defaultRubyAlign;
 		rubyOverflow = dic.rubyOverflow;	defaultRubyOverflow = dic.defaultRubyOverflow;
-		super.restore(dic);
 	}
 }
 

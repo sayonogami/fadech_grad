@@ -27,12 +27,12 @@ Scripts.execStorage("MessageLayerADV.tjs");
 @startanchor
 ;* ADD
 ;@position vertical=true
-;@deffont face="@‚l‚r ‚o–¾’©" size=24 bold=false rubyface="@‚l‚r ƒSƒVƒbƒN" rubysize=12
-@deffont face="‚l‚r ‚o–¾’©" size=24 bold=false rubyface="‚l‚r ƒSƒVƒbƒN" rubysize=12 Rbold=false
+;@deffont setruby face="@‚l‚r ‚o–¾’©" size=24 bold=false rubyface="@‚l‚r ƒSƒVƒbƒN" rubysize=12
+@deffont setruby face="‚l‚r ‚o–¾’©" size=24 bold=false rubyface="‚l‚r ƒSƒVƒbƒN" rubysize=12 Rbold=false
 @resetfont
 
 
-@deffont color=0xffffff shadow=false shadowcolor=0xffffff shadowoffsetx=3 shadowoffsety=3 edge edgecolor=0xffffff edgeextent=2 edgeemphasis=1024
+@deffont setruby color=0xffffff shadow=false shadowcolor=0xffffff shadowoffsetx=3 shadowoffsety=3 edge edgecolor=0xffffff edgeextent=2 edgeemphasis=1024
 ;@setDefaultChGradation color="0xFF0000,0xFF0000,0xFF0000,0xFFFFFF,0xFF0000,0xFF0000,0xFF0000" method="Rect" recttype=2 ch=false edge
 
 ;@font edge color=0xffffff shadow=false edgecolor=0x00ffff edgeextent=2 edgeemphasis=2048
@@ -66,7 +66,7 @@ Scripts.execStorage("MessageLayerADV.tjs");
 [r]
 
 @setDefaultChGradation color="0x228B22,0x006400,0x000000" method="Rect" recttype=1 ch=false edge
-@deffont color=0xffffff edge shadow=false edgecolor=0xffffff edgeextent=2 edgeemphasis=2048
+@deffont setruby color=0xffffff edge shadow=false edgecolor=0xffffff edgeextent=2 edgeemphasis=2048
 @resetChGradation
 @resetfont
 
@@ -113,7 +113,7 @@ Scripts.execStorage("MessageLayerADV.tjs");
 ;@deffont color=0xffffff edge shadow=false edgecolor=0x000000 edgeextent=2 edgeemphasis=2048
 
 @setDefaultChGradation color="0x228B22,0x006400,0x000000" method="Rect" recttype=1 ch=false edge
-@deffont color=0xffffff edge shadow=false edgecolor=0xffffff edgeextent=2 edgeemphasis=2048
+@deffont setruby color=0xffffff edge shadow=false edgecolor=0xffffff edgeextent=2 edgeemphasis=2048
 @resetChGradation
 
 @backlaych
