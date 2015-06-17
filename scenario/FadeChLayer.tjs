@@ -117,8 +117,8 @@ class FadeChLayer extends FadeLayer {
 		fontface = font.face;
 
 		rubysize = ml.rubySize;
-		rubybold = ml.rubyBold;
-		rubyface = ml.rubyFace;
+		rubybold = ml.r_Bold;
+		rubyface = ml.r_UserFace;
 		textExpandOverflow = ml.currentRubyOverflow;
 
 		hitType = ll.hitType;
@@ -259,7 +259,7 @@ class FadeChLayer extends FadeLayer {
 				if( ry < 0 ) height += (rw-ch_width);
 				ry = 0;
 			}
-			rx = int(x + ml.rubySize + ml.rubyOffset);
+			rx = int(x + rubysize + ml.rubyOffset);
 		} else {
 			rx = (ch_width - rw)/2;
 			if(rubymode=="e") {		// ‹Ï“™Š„‚è•t‚¯
@@ -274,7 +274,7 @@ class FadeChLayer extends FadeLayer {
 				if( rx < 0 ) width += (rw-ch_width);
 				rx = 0;
 			}
-			ry = int(y - ml.rubySize - ml.rubyOffset);
+			ry = int(y - rubysize - ml.rubyOffset);
 		}
 	// ˆÊ’u•â³
 		rx += expandX;
@@ -764,10 +764,10 @@ class FadeChLayer extends FadeLayer {
 		if(ml.chGradObj.withRuby) {
 			if(vertical) {
 				if(flag_ruby) p_x = ch_height + ml.rubyOffset;
-				g_w = ch_height + ml.rubySize + ml.rubyOffset;
+				g_w = ch_height + rubysize + ml.rubyOffset;
 			} else {
-				if(flag_ch) p_y += ml.rubySize + ml.rubyOffset;
-				g_h = ch_height + ml.rubySize + ml.rubyOffset;
+				if(flag_ch) p_y += rubysize + ml.rubyOffset;
+				g_h = ch_height + rubysize + ml.rubyOffset;
 			}
 		}
 

@@ -33,6 +33,19 @@ class MessageLayerADV extends MessageLayer {
 	var defaultShadowOffsetX = shadowOffsetX; // 影のオフセット
 	var defaultShadowOffsetY = shadowOffsetY; // 影のオフセット
 
+	// ルビ
+	var r_DefaultFace = "user"; // デフォルトのフォント
+	var r_UserFace = "ＭＳ Ｐ明朝"; // ユーザの選んだフォント
+	var r_DefaultBold = true; // デフォルトでボールドで描画するか
+	var r_Bold; // ボールドで描画するか
+
+	var r_DefaultShadowColor = 0x000000; // デフォルトの影の色
+	var r_ShadowColor; // 影の色
+	var r_DefaultEdgeColor = 0x0080ff; // デフォルトの縁取りの色
+	var r_EdgeColor; // 縁取りの色
+	var r_DefaultChColor = 0xffffff; // デフォルトの文字色
+	var r_ChColor; // 文字色
+
 	// ふらふら
 	var chSlant = 0;
 	var defaultChSlant = 0;
@@ -68,10 +81,6 @@ class MessageLayerADV extends MessageLayer {
 	var cx, cy;	// get_cx, get_cy
 	var currentRubyAlign = "e"; // 次の文字に対するルビの割り付け方法
 
-	var rubyBold = false;
-	var rubyFace;
-	var defaultRubyFace = "e";
-
 	var rubyAlign;
 	var defaultRubyAlign = "e";
 	// 親文字字間拡張機能 (ルビ長が親文字より長い際に親文字の字間を広げる機能)
@@ -86,6 +95,10 @@ class MessageLayerADV extends MessageLayer {
 
 	function MessageLayerADV(owner, parent, name, id, do_config) {
 		super.MessageLayer(...);
+		if(do_config) {
+			r_UserFace = userFace;
+			r_DefaultFace = userFace;
+		}
 
 		if(__flag_ChGradRecter_OBJECT_DEFINED__==1) {
 			chGradObj = new ChGradRecter(kag, name+"_ChGradRecter");
@@ -831,7 +844,11 @@ class MessageLayerADV extends MessageLayer {
 		edgeEmphasis	=	defaultEdgeEmphasis;
 		shadowOffsetX	=	defaultShadowOffsetX;
 		shadowOffsetY	=	defaultShadowOffsetY;
-		rubyFace		=	defaultRubyFace;
+		r_UserFace		=	r_DefaultFace;
+		r_Bold			=	r_DefaultBold;
+		r_ShadowColor	=	r_DefaultShadowColor;
+		r_EdgeColor		=	r_DefaultEdgeColor;
+		r_ChColor		=	r_DefaultChColor;
 		rubyAlign		=	defaultRubyAlign;
 		rubyOverflow	=	defaultRubyOverflow;
 		hchCorrect		=	defaultHchCorrect;
@@ -852,8 +869,18 @@ class MessageLayerADV extends MessageLayer {
 		if(elm.shadowoffsety == 'default')	shadowOffsetY	=	defaultShadowOffsetY;
 		else if(elm.shadowoffsety !== void)	shadowOffsetY = +elm.shadowoffsety;
 
-		if(elm.rubyface == 'default')		rubyFace = defaultRubyFace;
-		else if(elm.rubyface !== void)		rubyFace = elm.rubyface;
+		if(elm.rubyface == 'default')		r_UserFace = r_DefaultFace;
+		else if(elm.rubyface !== void)		r_UserFace = elm.rubyface;
+		if(elm.rbold == 'default')			r_Bold = r_DefaultBold;
+		else if(elm.rbold !== void)			r_Bold = elm.rbold;
+		if(elm.rshadowcolor == 'default')	r_ShadowColor = r_DefaultShadowColor;
+		else if(elm.rshadowcolor !== void)	r_ShadowColor = elm.rshadowcolor;
+		if(elm.redgecolor == 'default')		r_EdgeColor = r_DefaultEdgeColor;
+		else if(elm.redgecolor !== void)	r_EdgeColor = elm.redgecolor;
+		if(elm.rcolor == 'default')			r_ChColor = r_DefaultChColor;
+		else if(elm.rcolor !== void)		r_ChColor = elm.rcolor;
+
+
 		if(elm.rubyalign == 'default')		rubyAlign = defaultRubyAlign;
 		else if(elm.rubyalign !== void)		rubyAlign = elm.rubyalign;
 
@@ -872,10 +899,14 @@ class MessageLayerADV extends MessageLayer {
 		defaultEdgeEmphasis = +elm.edgeemphasis if elm.edgeemphasis !== void;
 		defaultShadowOffsetX = +elm.shadowoffsetx if elm.shadowoffsetx !== void;
 		defaultShadowOffsetY = +elm.shadowoffsety if elm.shadowoffsety !== void;
-		defaultRubyFace = elm.rubyface if elm.rubyface !== void;
 		defaultRubyAlign = elm.rubyalign if elm.rubyalign !== void;
 		defaultRubyOverflow = elm.rubyoverflow if elm.rubyoverflow !== void;
 		defaultHchCorrect = +elm.hchcorrect if elm.hchcorrect !== void;
+		r_DefaultFace = elm.rubyface if elm.rubyface !== void;
+		r_DefaultBold = +elm.rbold if elm.rbold !== void;
+		r_DefaultChColor = +elm.rcolor if elm.rcolor !== void;
+		r_DefaultShadowColor = +elm.rshadowcolor if elm.rshadowcolor !== void;
+		r_DefaultEdgeColor = +elm.redgecolor if elm.redgecolor !== void;
 
 		super.setDefaultFont(elm);
 	}
@@ -1028,7 +1059,6 @@ class MessageLayerADV extends MessageLayer {
 
 		hchCorrect = src.hchCorrect; defaultHchCorrect = src.defaultHchCorrect;
 
-
 		defaultChGradMode = src.defaultChGradMode;		chGradMode = src.chGradMode;
 		defaultChGradLoopC = src.defaultChGradLoopC;	chGradLoopC = src.chGradLoopC;
 		defaultChGradation = src.defaultChGradation;	chGradation = src.chGradation;
@@ -1062,7 +1092,12 @@ class MessageLayerADV extends MessageLayer {
 		shadowOffsetX = src.shadowOffsetX;	defaultShadowOffsetX = src.defaultShadowOffsetX;
 		shadowOffsetY = src.shadowOffsetY;	defaultShadowOffsetY = src.defaultShadowOffsetY;
 
-		rubyFace = src.rubyFace;	defaultRubyFace = src.defaultRubyFace;
+		r_UserFace = src.r_UserFace;	r_DefaultFace = src.r_DefaultFace;
+		r_Bold = src.r_Bold;	r_DefaultBold = src.r_DefaultBold;
+		r_ShadowColor = src.r_ShadowColor;	r_DefaultShadowColor = src.r_DefaultShadowColor;
+		r_EdgeColor = src.r_EdgeColor;	r_DefaultEdgeColor = src.r_DefaultEdgeColor;
+		r_ChColor = src.r_ChColor;	r_DefaultChColor = src.r_DefaultChColor;
+
 		rubyAlign = src.rubyAlign;	defaultRubyAlign = src.defaultRubyAlign;
 		rubyOverflow = src.rubyOverflow;	defaultRubyOverflow = src.defaultRubyOverflow;
 	}
@@ -1111,7 +1146,12 @@ class MessageLayerADV extends MessageLayer {
 		dic.shadowOffsetX = shadowOffsetX;	dic.defaultShadowOffsetX = defaultShadowOffsetX;
 		dic.shadowOffsetY = shadowOffsetY;	dic.defaultShadowOffsetY = defaultShadowOffsetY;
 
-		dic.rubyFace = rubyFace;	dic.defaultRubyFace = defaultRubyFace;
+		dic.r_UserFace = r_UserFace;	dic.r_DefaultFace = r_DefaultFace;
+		dic.r_Bold = r_Bold;	dic.r_DefaultBold = r_DefaultBold;
+		dic.r_ShadowColor = r_ShadowColor;	dic.r_DefaultShadowColor = r_DefaultShadowColor;
+		dic.r_EdgeColor = r_EdgeColor;	dic.r_DefaultEdgeColor = r_DefaultEdgeColor;
+		dic.r_ChColor = r_ChColor;	dic.r_DefaultChColor = r_DefaultChColor;
+
 		dic.rubyAlign = rubyAlign;	dic.defaultRubyAlign = defaultRubyAlign;
 		dic.rubyOverflow = rubyOverflow;	dic.defaultRubyOverflow = defaultRubyOverflow;
 		return dic;
@@ -1182,7 +1222,13 @@ class MessageLayerADV extends MessageLayer {
 		edgeEmphasis = dic.edgeEmphasis;	defaultEdgeEmphasis = dic.defaultEdgeEmphasis;
 		shadowOffsetX = dic.shadowOffsetX;	defaultShadowOffsetX = dic.defaultShadowOffsetX;
 		shadowOffsetY = dic.shadowOffsetY;	defaultShadowOffsetY = dic.defaultShadowOffsetY;
-		rubyFace = dic.rubyFace;	defaultRubyFace = dic.defaultRubyFace;
+
+		r_UserFace = dic.r_UserFace;	r_DefaultFace = dic.r_DefaultFace;
+		r_Bold = dic.r_Bold;	r_DefaultBold = dic.r_DefaultBold;
+		r_ShadowColor = dic.r_ShadowColor;	r_DefaultShadowColor = dic.r_DefaultShadowColor;
+		r_EdgeColor = dic.r_EdgeColor;	r_DefaultEdgeColor = dic.r_DefaultEdgeColor;
+		r_ChColor = dic.r_ChColor;	r_DefaultChColor = dic.r_DefaultChColor;
+
 		rubyAlign = dic.rubyAlign;	defaultRubyAlign = dic.defaultRubyAlign;
 		rubyOverflow = dic.rubyOverflow;	defaultRubyOverflow = dic.defaultRubyOverflow;
 		super.restore(dic);

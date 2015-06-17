@@ -28,7 +28,7 @@ Scripts.execStorage("MessageLayerADV.tjs");
 ;* ADD
 ;@position vertical=true
 ;@deffont face="@‚l‚r ‚o–¾’©" size=24 bold=false rubyface="@‚l‚r ƒSƒVƒbƒN" rubysize=12
-@deffont face="‚l‚r ‚o–¾’©" size=24 bold=false rubyface="‚l‚r ƒSƒVƒbƒN" rubysize=12
+@deffont face="‚l‚r ‚o–¾’©" size=24 bold=false rubyface="‚l‚r ƒSƒVƒbƒN" rubysize=12 Rbold=false
 @resetfont
 
 
