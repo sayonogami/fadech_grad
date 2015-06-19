@@ -615,7 +615,7 @@ class MessageLayerADV extends MessageLayer {
 	function getFadeChLayer() {
 		var cl_ = fadeChLayers.pop();
 		if(cl_ === void) { 
-			cl_ = new FadeChLayer(window, lineLayer);
+			cl_ = new FadeChLayer(window, this);
 			cl_.__id = id__++;
 		}
 
@@ -869,16 +869,24 @@ class MessageLayerADV extends MessageLayer {
 		if(elm.shadowoffsety == 'default')	shadowOffsetY	=	defaultShadowOffsetY;
 		else if(elm.shadowoffsety !== void)	shadowOffsetY = +elm.shadowoffsety;
 
-		if(elm.rubyface == 'default')		r_UserFace = r_DefaultFace;
-		else if(elm.rubyface !== void)		r_UserFace = elm.rubyface;
-		if(elm.rbold == 'default')			r_Bold = r_DefaultBold;
-		else if(elm.rbold !== void)			r_Bold = elm.rbold;
-		if(elm.rshadowcolor == 'default')	r_ShadowColor = r_DefaultShadowColor;
-		else if(elm.rshadowcolor !== void)	r_ShadowColor = elm.rshadowcolor;
-		if(elm.redgecolor == 'default')		r_EdgeColor = r_DefaultEdgeColor;
-		else if(elm.redgecolor !== void)	r_EdgeColor = elm.redgecolor;
-		if(elm.rcolor == 'default')			r_ChColor = r_DefaultChColor;
-		else if(elm.rcolor !== void)		r_ChColor = elm.rcolor;
+		if(elm.rubyconfig) {
+			if(elm.rubyface == 'default')		r_UserFace = r_DefaultFace;
+			else if(elm.rubyface !== void)		r_UserFace = elm.rubyface;
+			if(elm.rbold == 'default')			r_Bold = r_DefaultBold;
+			else if(elm.rbold !== void)			r_Bold = elm.rbold;
+			if(elm.rshadowcolor == 'default')	r_ShadowColor = r_DefaultShadowColor;
+			else if(elm.rshadowcolor !== void)	r_ShadowColor = elm.rshadowcolor;
+			if(elm.redgecolor == 'default')		r_EdgeColor = r_DefaultEdgeColor;
+			else if(elm.redgecolor !== void)	r_EdgeColor = elm.redgecolor;
+			if(elm.rcolor == 'default')			r_ChColor = r_DefaultChColor;
+			else if(elm.rcolor !== void)		r_ChColor = elm.rcolor;
+		} else {
+			r_UserFace = userFace;
+			r_Bold = bold;
+			r_ChColor = chColor;
+			r_ShadowColor = shadowColor;
+			r_EdgeColor =edgeColor;
+		}
 
 		if(elm.rubyalign == 'default')		rubyAlign = defaultRubyAlign;
 		else if(elm.rubyalign !== void)		rubyAlign = elm.rubyalign;
@@ -904,7 +912,7 @@ class MessageLayerADV extends MessageLayer {
 		defaultRubyOverflow = elm.rubyoverflow if elm.rubyoverflow !== void;
 		defaultHchCorrect = +elm.hchcorrect if elm.hchcorrect !== void;
 
-		if(elm.setruby) {
+		if(elm.rubyconfig) {
 			r_DefaultFace = elm.rubyface if elm.rubyface !== void;
 			r_DefaultBold = +elm.rbold if elm.rbold !== void;
 			r_DefaultChColor = +elm.rcolor if elm.rcolor !== void;

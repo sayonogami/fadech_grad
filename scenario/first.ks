@@ -27,12 +27,12 @@ Scripts.execStorage("MessageLayerADV.tjs");
 @startanchor
 ;* ADD
 ;@position vertical=true
-;@deffont setruby face="@‚l‚r ‚o–¾’©" size=24 bold=false rubyface="@‚l‚r ƒSƒVƒbƒN" rubysize=12
-@deffont setruby face="‚l‚r ‚o–¾’©" size=24 bold=false rubyface="‚l‚r ƒSƒVƒbƒN" rubysize=12 Rbold=false
+;@deffont rubyconfig face="@‚l‚r ‚o–¾’©" size=24 bold=false rubyface="@‚l‚r ƒSƒVƒbƒN" rubysize=12
+@deffont rubyconfig face="‚l‚r ‚o–¾’©" size=24 bold=false rubyface="‚l‚r ƒSƒVƒbƒN" rubysize=12 Rbold=false Rcolor=0x00FFFF
 @resetfont
 
 
-@deffont setruby color=0xffffff shadow=false shadowcolor=0xffffff shadowoffsetx=3 shadowoffsety=3 edge edgecolor=0xffffff edgeextent=2 edgeemphasis=1024
+@deffont rubyconfig color=0xffffff shadow=false shadowcolor=0xffffff shadowoffsetx=3 shadowoffsety=3 edge edgecolor=0xffffff edgeextent=2 edgeemphasis=1024
 ;@setDefaultChGradation color="0xFF0000,0xFF0000,0xFF0000,0xFFFFFF,0xFF0000,0xFF0000,0xFF0000" method="Rect" recttype=2 ch=false edge
 
 ;@font edge color=0xffffff shadow=false edgecolor=0x00ffff edgeextent=2 edgeemphasis=2048
@@ -64,9 +64,8 @@ Scripts.execStorage("MessageLayerADV.tjs");
 [link target="*about"]ƒTƒ“ƒvƒ‹‚ğŒ©‚é[endlink][r]
 ‚½‚Æ‚¦‚Î¨graph‚Å[graph storage="ExQuestion.png" alt="!?"]‚µ‚½‚è•¶š‚Å[ch_!?]‚µ‚½‚è[r]
 [r]
-
 @setDefaultChGradation color="0x228B22,0x006400,0x000000" method="Rect" recttype=1 ch=false edge
-@deffont setruby color=0xffffff edge shadow=false edgecolor=0xffffff edgeextent=2 edgeemphasis=2048
+@deffont rubyconfig color=0xffffff edge shadow=false edgecolor=0xffffff edgeextent=2 edgeemphasis=2048
 @resetChGradation
 @resetfont
 
@@ -80,7 +79,7 @@ Scripts.execStorage("MessageLayerADV.tjs");
 @[r_‚±‚Ì]Ÿ“V[ŒP‰¼–¼]ƒm[/ŒP‰¼–¼]’T—‚ÍAÀ‚É“ú–{Œ|p‚Ì”­‘«‚ÌŒ¹‚ğ‚È‚µ‚Ä[r_ƒC]‚î‚é‚à‚Ì‚Å‚ ‚éB
 @style align=center
 [r]
-[r]
+[graph storage="‚×‚µ‚İ"][graph storage="‚×‚µ‚İ"][graph storage="‚×‚µ‚İ"][r]
 [r]
 @font bold edge edgecolor=0x00FF00
 @setChGradation color="0xFF0000,0xFF0000,0xFF0000,0xFFFFFF,0x0000FF,0x0000FF,0x0000FF" method="Rect" recttype=3 dir=45 ch edge=false
@@ -113,7 +112,7 @@ Scripts.execStorage("MessageLayerADV.tjs");
 ;@deffont color=0xffffff edge shadow=false edgecolor=0x000000 edgeextent=2 edgeemphasis=2048
 
 @setDefaultChGradation color="0x228B22,0x006400,0x000000" method="Rect" recttype=1 ch=false edge
-@deffont setruby color=0xffffff edge shadow=false edgecolor=0xffffff edgeextent=2 edgeemphasis=2048
+@deffont rubyconfig color=0xffffff edge shadow=false edgecolor=0xffffff edgeextent=2 edgeemphasis=2048
 @resetChGradation
 
 @backlaych
