@@ -510,15 +510,20 @@ class FadeChLayer extends FadeLayer {
 			onRubyPhase(false);
 		}
 
+// グラデがおかしい
+// みっちりテストする
 		if(ischar && (edge || shadow)) {
 			if(ml.chGradObj.doChGrad) {
 				var gColor = color, gEdgeColor = esC;
 				if(ml.chGradObj.ch) { gColor = 0x000000; }
 				if(ml.chGradObj.edge) { gEdgeColor = 0x000000; }
+			//	if(ml.chGradObj.ch) { gColor = 0x000000; }
+			//	if(ml.chGradObj.edge) { gEdgeColor = 0xFFFFFF; eeX=0; sX=0; sX=0; }
 
 				initGradComplexLayer();
 
-				drawGraphCh(cx, cy, lay, color, ischar, edge, shadow, eeX, esC, eEm, sX, sY);
+				drawGraphCh(cx, cy, lay, 0xffffff, ischar, edge, shadow, eeX, 0xffffff, eEm, sX, sY);
+//				drawGraphCh(cx, cy, lay, 0xffffff, ischar, edge, shadow, eeX, 0xffffff, eEm, sX, sY);
 				GradChLayer.operateRect(0, 0, cl, 0, 0, width, height, omAlpha, 255);
 
 				OperateGradationBase(cx, cy, ch_width, ch_height, eeX, sX, sY);
@@ -526,7 +531,7 @@ class FadeChLayer extends FadeLayer {
 				drawGraphCh(cx, cy, lay, gColor, ischar, edge, shadow, eeX, gEdgeColor, eEm, sX, sY);
 
 				// 比較(明)合成で、影とグラデを合成
-				GradChLayer.operateRect(0, 0, cl, 0, 0, this.width, this.height, omLighten, 255); 
+				GradChLayer.operateRect(0, 0, cl, 0, 0, this.width, this.height, omPsLighten, 255); 
 
 				finalizeGradComplexLayer();
 			} else {
@@ -553,8 +558,10 @@ class FadeChLayer extends FadeLayer {
 			.setSize(this.width, this.height);
 			.fillRect(0, 0, .width, .height, 0x00000000);
 			.copyRect(cx, cy, lay, 0, 0, lay.width, lay.height);
+		//	.type = ltPsDarken;
 			.face = dfOpaque;
 			.fillRect(0, 0, .width, .height, esC);
+		//	.type = this.type;
 			.face = this.face;
 		}
 
@@ -734,20 +741,20 @@ class FadeChLayer extends FadeLayer {
 		// 確実にグラデとその他の色が合成される
 		var gColor = col, gEdgeColor = sc;
 		if(ml.chGradObj.ch) { gColor = 0x000000; }
-		if(ml.chGradObj.edge) { gEdgeColor = 0x000000; }
+		if(ml.chGradObj.edge) { gEdgeColor = 0xFFFFFF; sl=0; ee=0; sofx=0; sofy=0; }
 
 		with(cl) {
-			.face = face; .type = type;
+			.face = dfAlpha; .type = type;
 			with(cl.font) {
 				.angle = font.angle; .italic = font.italic;
 				.strikeout = font.strikeout; .underline = font.underline;
 				.height = font.height; .bold = font.bold; .face = font.face;
 			}
 			.setSize(this.width, this.height);
-		//	.fillRect(0, 0, .width, .height, 0x00000000);		// 掃除
 			.drawText(x, y, text, gColor, opa, aa, sl, gEdgeColor, ee, sofx, sofy);
+			.face = face;
 		}
-		GradChLayer.operateRect(0, 0, cl, 0, 0, this.width, this.height, omLighten, 255); 
+		GradChLayer.operateRect(0, 0, cl, 0, 0, this.width, this.height, omPsLighten, 255); 
 	}
 
 	function OperateGradationBase(x, y, w, h, ee, sofx, sofy) {
