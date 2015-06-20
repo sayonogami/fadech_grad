@@ -64,13 +64,13 @@ Scripts.execStorage("MessageLayerADV.tjs");
 [link target="*about"]サンプルを見る[endlink][r]
 たとえば→graphで[graph storage="ExQuestion.png" alt="!?"]したり文字で[ch_!?]したり[r]
 [r]
-@setDefaultChGradation color="0x228BFF,0x006400,0x000000" method="Rect" recttype=1 ch edge=false
+@setDefaultChGradation color="0x228BFF,0x006400,0x0000ff" method="Rect" recttype=3 rot=30 ch=false edge
 @deffont rubyconfig color=0xffffff edge shadow=false edgecolor=0xff0000 edgeextent=2 edgeemphasis=2048
 @resetChGradation
 @resetfont
 
 @style align=left
-　[傍][r_・]あ[r_・]ま[r_・]ん[r_・]じ[r_・]や[r_・]く[/傍]は[r_すなわち]即、土地の精霊で、日本紀には、[r_アマ]天[訓仮名]ノ[/訓仮名][r_サグメ][ch_探女]として其話があり、古事記や万葉集にも見える。[r]
+　[傍][r_・]あ[r_・]ま[r_・]ん[r_・]じ[r_・]や[r_・]く[/傍]は[r_すなわち]即、土地の精霊で、日本紀には、[r_アマ]天[訓仮名]ノ[/訓仮名][r_サグメ][ch_探女]として其話があり、[ch_古事記]や[ch_万葉集]にも見える。[r]
 
 　やはり、何にでも邪魔を入れる、といふ名ま[r_え]へであらう。[r]
 
