@@ -1,2 +1,2 @@
-*.tjs	encoding=shiftjis
-*.ks	encoding=shiftjis
+*.tjs	encoding=shiftjis linguist-language=KAG
+*.ks	encoding=shiftjis linguist-language=TJS
