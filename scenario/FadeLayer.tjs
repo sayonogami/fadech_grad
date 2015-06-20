@@ -332,8 +332,21 @@ class FadeLayer extends Layer {
 			return super.visible;
 		}
 	}
-
 */
+
+	function assignFont(compLayer) {
+		with(compLayer.font) {
+			font.height = .height;
+			font.bold = .bold;
+			font.face = .face;
+
+			font.angle = .angle;
+			font.italic = .italic;
+			font.strikeout = .strikeout;
+			font.underline = .underline;
+		}
+	}
+
 	property enabled {
 		setter(x) {
 			super.enabled = x;
@@ -358,7 +371,17 @@ class FadeLayer extends Layer {
 		var tmpLayer = kag.temporaryLayer;	// àÍéûìIÇ»ÉåÉCÉÑ
 		var upt = 2;		// î{ó¶ - ìÒî{à»è„ÇÕâòÇ¢ÇæÇØ + CPU ÇÃñ≥ë å≠Ç¢
 		with(tmpLayer) {
-			.font.height = this.font.height * upt;
+			with(tmpLayer.font) {
+				.height = this.font.height * upt;
+				.bold = font.bold;
+				.face = font.face;
+
+				.angle = font.angle;
+				.italic = font.italic;
+				.strikeout = font.strikeout;
+				.underline = font.underline;
+			}
+
 			.setPos(0,0,.font.getTextWidth(text), .font.getTextHeight(text));
 			.fillRect(0, 0, .width, .height, 0x00000000);
 			.drawText(0, 0, text, col, opa, aa, sl, sc, sw, sofx, sofy);
@@ -371,6 +394,17 @@ class FadeLayer extends Layer {
 		}
 	}
 */
+function calcPerAccel(per, accel) {
+	if(accel<=-2)
+		return per = 1.0 - Math.pow(1.0-per, -accel);
+	else if(accel>=2)
+		return per = Math.pow(per, accel);
+	else
+		return per;
+}
+
+function autoSelect(i, els) {return i!==void ? i : els;
+}
 
 }
 @endif

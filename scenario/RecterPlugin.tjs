@@ -11,8 +11,6 @@
 / 
 / flush が真なら表レイヤに塗られるだけなので opacity 変化でフラッシュ効果
 / 	留意 - flush 時はトランジションをしても消えます
-/ flush 機能は FadePlugin(未公開) を使って管理することを前提に作ったので、通常は
-/ 使わない方がいいと思います
 /
 /
 / left, top, width, height は「そのレイヤ」の位置と大きさを表し、
@@ -47,8 +45,6 @@ try { Plugins.link("util_graph.dll");
 catch(e) { dm("RecterPlugin : util_graph.dllが見つかりませんでした"); }
 
 Scripts.execStorage("KAGPluginLX.tjs");
-// Scripts.execStorage("_FadePlugin.tjs");
-
 class RecterHalfWayTransLayer extends Layer {
 	var propersnum;	// props[num] の num
 	var transPhase;	// 0:実行していない, 1:実行した
@@ -386,6 +382,9 @@ function splitLayer(fores = [], backs = [], strings, page="fore") {
 	}
 }
 
+function autoSelect(i, els) {
+	return i!==void ? i : els;
+}
 
 }
 
@@ -433,22 +432,26 @@ class RecterPluginManager {
 	// とりあえず、末尾にHideを付けるということで。
 	function setHide(elm) {
 		elm.hide = true;
-		RecterPlugin_objects[elm.layer].set(elm);
+		if(elm.layer===void) elm.layer = 0;
+		RecterPlugin_objects_Hide[elm.layer].set(elm);
 	}
 
 	function finishHide(elm) {
 		elm.hide = true;
-		RecterPlugin_objects[elm.layer].finish(elm);
+		if(elm.layer===void) elm.layer = 0;
+		RecterPlugin_objects_Hide[elm.layer].finish(elm);
 	}
 
 	function stopHide(elm) {
 		elm.hide = true;
-		RecterPlugin_objects[elm.layer].stop(elm);
+		if(elm.layer===void) elm.layer = 0;
+		RecterPlugin_objects_Hide[elm.layer].stop(elm);
 	}
 
 	function getLayerHide(elm) {
 		elm.hide = true;
-		return RecterPlugin_objects[elm.layer].showLayer;
+		if(elm.layer===void) elm.layer = 0;
+		return RecterPlugin_objects_Hide[elm.layer].showLayer;
 	}
 
 

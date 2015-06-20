@@ -137,6 +137,8 @@ class KAGPluginLX extends KAGPlugin {
 	// ƒŒƒCƒ„‚Ì‰Šú‰»B
 	// set() “à‚ÅŒÄ‚Î‚ê‚é
 		if(!doing || !elm.continue) {
+			if(transLayer!==void) invalidate transLayer;
+			if(showLayer!==void) invalidate showLayer;
 			transLayer = new Layer(window, kag.fore.base);
 			showLayer = new Layer(window, kag.back.base);
 		}

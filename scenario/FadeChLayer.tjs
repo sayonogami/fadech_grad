@@ -21,6 +21,7 @@
 @if(__FADECHLAYER_DEFINED__==0)
 @set(__FADECHLAYER_DEFINED__=1)
 
+Scripts.execStorage("SharedContinuousHandler.tjs");
 Scripts.execStorage("FadeLayer.tjs");
 class FadeChLayer extends FadeLayer {
 	var __id;
@@ -102,11 +103,7 @@ class FadeChLayer extends FadeLayer {
 
 	function copyCondition() {
 		with(ll) {
-			font.angle = .font.angle;
-			font.bold = .font.bold;
-			font.italic = .font.italic;
-			font.height = .font.height;
-			font.face = .font.face;
+			assignFont(ll);
 			hitType = .hitType;
 			hitThreshold = .hitThreshold;
 			type = .type;
@@ -745,11 +742,7 @@ class FadeChLayer extends FadeLayer {
 
 		with(cl) {
 			.face = dfAlpha; .type = type;
-			with(cl.font) {
-				.angle = font.angle; .italic = font.italic;
-				.strikeout = font.strikeout; .underline = font.underline;
-				.height = font.height; .bold = font.bold; .face = font.face;
-			}
+			.assignFont(this);
 			.setSize(this.width, this.height);
 			.fillRect(0, 0, .width, .height, 0x00000000);
 			.drawText(x, y, text, gColor, opa, aa, sl, gEdgeColor, ee, sofx, sofy);
@@ -883,7 +876,7 @@ class FadeChLayer extends FadeLayer {
 				.type = this.type;
 				.setPos(0,0, this.width, this.height);
 				.fillRect(0, 0, .width, .height, 0x00000000);
-				.font.height=font.height; .font.bold=font.bold; .font.face=font.face;
+				.assignFont(this);
 			}
 		}
 	}
