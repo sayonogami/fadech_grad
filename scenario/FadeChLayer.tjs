@@ -4,7 +4,6 @@
 / 
 / メッセージレイヤで文字をフェード表示させるためのレイヤ
 /
-/
 / 親文字字間拡張機能 (ルビ長が親文字より長い際に親文字の字間を広げる機能)
 / 　均等割り付け( align="e" )時にのみ処理が行われる
 / ※ルビ長が親文字より長い際に親文字の字間を広げる機能、における改行について
@@ -15,6 +14,9 @@
 / 		移動する。「ただし改行処理は行われない」
 / そのため、ルビと親文字の文字数によっては文字が右端(縦書きなら下端)にはみ出て
 / しまう可能性がある。チェックし、手動で改行処理をすること。
+/ 
+/ メモ：縦書きGrad時にShift-JIS依存のコードを付けようか迷い中。
+/       Zへの移植時には注意すること
 /----------------------------------------------------------------------------*/
 @if(__FADECHLAYER_DEFINED__==0)
 @set(__FADECHLAYER_DEFINED__=1)
@@ -31,12 +33,17 @@ class FadeChLayer extends FadeLayer {
 	var flag_hch;
 
 	var cl;				// テンポラリレイヤ
-	var GradChLayer;	// グラデ描画用FadeChLayer
+
+	// ルビ付き・複数文字・縦中横・グラフChなどの複雑な文字を描画するか
+	var flag_GradComplexChar;
+	// グラデ描画用FadeChLayer
+	// 単一の文字を描くときはこのレイヤ自身
+	// ルビやchタグによる複数文字を描くときは、MessageLayerからもらってきた別のFadeChLayer
+	var GradChLayer;
 
 	var floated;		// （改行などで）他のFadeChLayerから影響を受けなくなったか
-//	var comp;			// 裏レイヤ
 
-	var fontsize, fontbold, fontface;
+//	var fontsize, fontbold, fontface;
 	var textwidth, textheight;	// 回転時に利用するテキスト横幅・縦幅
 
 	var ch_left;		// 親文字のleft
@@ -45,7 +52,6 @@ class FadeChLayer extends FadeLayer {
 	var ch_height;		// 親文字の縦幅
 
 	var ruby, rubymode;
-	var rubysize, rubybold, rubyface;
 	var rx, ry, span;	// ルビ上端位置・"e"時の1文字毎のスペース
 
 	var expandX, expandY;	// 追加で広げた量
@@ -71,8 +77,8 @@ class FadeChLayer extends FadeLayer {
 	function FadeChLayer(window, parent) {
 		super.FadeLayer(...);
 		this.parent = parent;
-		ll = parent;
-		ml = parent.parent;	// メッセージレイヤ
+		ml = parent;	// メッセージレイヤ
+		ll = parent.lineLayer;
 
 		deffadetime = ml.chfadetime;
 		with(cl = new global.FadeLayer(window, this)) {
@@ -95,34 +101,26 @@ class FadeChLayer extends FadeLayer {
 */
 
 	function copyCondition() {
-		this.parent = ll.parent;
-
-		vertical = ml.vertical;
-		font.angle = ll.font.angle;
-		font.bold = ll.font.bold;
-		font.italic = ll.font.italic;
-		font.height = ll.font.height;
-		font.face = ll.font.face;
-		fontbold = font.bold;
-		fontsize = font.height;
-		fontface = font.face;
-
-		rubysize = ml.rubySize;
-		rubybold = ml.rubyBold;
-		rubyface = ml.rubyFace;
-		textExpandOverflow = ml.currentRubyOverflow;
-
-		hitType = ll.hitType;
-		hitThreshold = ll.hitThreshold;
-		type = ll.type;
-
-		deffadetime = ml.chfadetime;
-		skip = ml.processChnInF;
-		fade = ml.ch4Fade;
+		with(ll) {
+			font.angle = .font.angle;
+			font.bold = .font.bold;
+			font.italic = .font.italic;
+			font.height = .font.height;
+			font.face = .font.face;
+			hitType = .hitType;
+			hitThreshold = .hitThreshold;
+			type = .type;
+		}
+		with(ml) {
+			vertical = .vertical;
+			textExpandOverflow = .currentRubyOverflow;
+			deffadetime = .chfadetime;
+			skip = .processChnInF;
+			fade = .ch4Fade;
+		}
 	}
 
 	function initChLayer(_dx, _dy, _dw, _dh) {
-	//	this.parent = ll;
 		floated = false;
 
 		setPos(
@@ -137,17 +135,26 @@ class FadeChLayer extends FadeLayer {
 	}
 
 	function resetChLayer() {
-		this.parent = ll;
 		ruby = "";	rubymode = "e";
-		rx = ry = span = 0;
-		opacity = 0;
-		textwidth = textheight = 0;
-		expandX = expandY = 0;
+		rx = ry = span
+			 = opacity
+			 = textwidth = textheight
+			 = expandX = expandY
+			 = slantx = slanty
+			 = r_cwh
+			 = r_cw = r_ch = r_cwh = r_a = r_tx = r_ty
+			 = rad = radMove
+			 = slantMoveX = slantMoveY
+			 = textExpandLength
+		 = 0;
+
 		name="";
 
-		flag_ch = false;
-		flag_ruby = false;
-		flag_hch = false;
+		flag_ch
+			 = flag_ruby
+			 = flag_hch
+			 = flag_GradComplexChar
+		= false;
 
 		imageWidth = 8;	imageHeight = 8;
 		setSizeToImageSize();
@@ -159,19 +166,19 @@ class FadeChLayer extends FadeLayer {
 		fillRect(0, 0, imageWidth, imageHeight, 0);		// 領域をクリア
 		face = dfAuto;
 
-		cl.width = 8; cl.height = 8;
-		cl.face = dfAuto;
-		cl.type = ltAddAlpha;
-		if(rot!="n" || rotMove!="n") cl.fillRect(0, 0, cl.width, cl.height, 0x00000000);
+		with(cl) {
+			.type = type;
+			.width = 8; .height = 8;
+			.imageWidth = 8;	.imageHeight = 8;
+			.setSizeToImageSize();
+			.face = dfAuto;
+			.fillRect(0, 0, .width, .height, 0);		// 完全透明に
+			.face = dfProvince;
+			.fillRect(0, 0, .width, .height, 0);		// 完全透明に
+			.face = dfAuto;
+		}
 
-		slantx = slanty = 0;
-		r_cwh = 0;
-		r_cw = r_ch = r_cwh = r_a = r_tx = r_ty = 0;
-		rad = radMove = 0;
 		rot = rotMove = "n";
-		slantMoveX = slantMoveY = 0;
-
-		textExpandLength = 0;
 
 		skip = false;
 		fade = false;
@@ -183,7 +190,6 @@ class FadeChLayer extends FadeLayer {
 	}
 
 	function setSlant(x, y) {
-		// 
 		slantx += x; slanty += y;
 		setPos(slantx, slanty);
 	}
@@ -318,12 +324,12 @@ class FadeChLayer extends FadeLayer {
 
 	function drawCh4Parent() {
 		if(!visible) return false;
-		parent.face = dfAuto;
-		parent.operateRect(left, top, this, 0, 0, width, height);
-		parent.face = dfProvince;
+		ml.face = dfAuto;
+		ml.operateRect(left, top, this, 0, 0, width, height);
+		ml.face = dfProvince;
 
 		resetChLayer();
-		ll.parent.putFadeChLayer(this);
+		ml.putFadeChLayer(this);
 
 		return true;
 	}
@@ -338,73 +344,69 @@ class FadeChLayer extends FadeLayer {
 	function assign(comp) {
 	// メッセージレイヤがトランジション前にassain()する時に呼ばれる
 	// 対となる FadeChLayer の情報をコピーし、対と同様の動作をさせる
-		this.parent = comp.parent.comp;
+		with(comp) {
+			this.parent = .parent.comp;
+			// ↓fadelayer
+			hitType = .hitType;
+			hitThreshold = .hitThreshold;
+			type = .type;
+			name = .name;
+			startopa	= .startopa;	goalopa	= .goalopa;
+			startl		= .startl;		goall	= .goall;
+			startt		= .startt;		goalt	= .goalt;
+			time		= .time;
+			accel		= .accel;
+			nowisenabled= .nowisenabled;
+			starttick	= .starttick;
+			doing		= .doing;
+			opacity		= .opacity;
+			visible		= .visible;
+			setPos(.left, .top, .width, .height);
+			// ↑fadelayer
 
-		hitType = comp.hitType;
-		hitThreshold = comp.hitThreshold;
-		type = comp.type;
-		name = comp.name;
+			vertical	= .vertical;
+			floated		= .floated;
 
-		startopa	= comp.startopa;	goalopa	= comp.goalopa;
-		startl		= comp.startl;		goall	= comp.goall;
-		startt		= comp.startt;		goalt	= comp.goalt;
-		time		= comp.time;
-		accel		= comp.accel;
-		nowisenabled= comp.nowisenabled;
-		starttick	= comp.starttick;
-		doing		= comp.doing;
-		vertical	= comp.vertical;
-		opacity		= comp.opacity;
-		floated		= comp.floated;
+			textExpandOverflow = .textExpandOverflow;
 
-		visible		= comp.visible;
+			ruby		= .ruby;
+			rubymode	= .rubymode;
+			rx			= .rx;			ry		= .ry;
+			span		= .span;
 
-		fontsize	= comp.fontsize;
-		fontbold	= comp.fontbold;
-		fontface	= comp.fontface;
-		textExpandOverflow = comp.textExpandOverflow;
+			slantx		= .slantx;		slanty	= .slanty;
+			slantMoveX	= .slantMoveX;	slantMoveY	= .slantMoveY;
+			rot			= .rot;			rad		= .rad;
+			rotMove		= .rotMove;		radMove	= .radMove;
 
-		ruby		= comp.ruby;
-		rubymode	= comp.rubymode;
-		rubysize	= comp.rubysize;
-		rubybold	= comp.rubybold;
-		rubyface	= comp.rubyface;
-		rx			= comp.rx;			ry		= comp.ry;
-		span		= comp.span;
+			if(rot!="n" || rotMove!="n") {	// 回転
+				r_cw		= .r_cw;		r_ch	= .r_ch;
+				r_cwh		= .r_cwh;
+				r_a			= .r_a;
+				r_tx		= .r_tx;		r_ty	= .r_ty;
 
-		slantx		= comp.slantx;		slanty	= comp.slanty;
-		slantMoveX	= comp.slantMoveX;	slantMoveY	= comp.slantMoveY;
-		rot			= comp.rot;			rad		= comp.rad;
-		rotMove		= comp.rotMove;		radMove	= comp.radMove;
+				cl.setPos(0, 0, .cl.width, .cl.height);
+				cl.operateRect(0, 0, .cl, 0, 0, cl.width, cl.height, omAuto, 255);
+				cl.fillRect(cl.width/2-1, cl.height/2-1, 2, 2, 0xffff0000);
+				cl.face = .cl.face;
+				cl.type = .cl.type;
+			}
 
-		setPos(comp.left, comp.top, comp.width, comp.height);
-
-		if(rot!="n" || rotMove!="n") {	// 回転
-			r_cw		= comp.r_cw;		r_ch	= comp.r_ch;
-			r_cwh		= comp.r_cwh;
-			r_a			= comp.r_a;
-			r_tx		= comp.r_tx;		r_ty	= comp.r_ty;
-
-			cl.setPos(0, 0, comp.cl.width, comp.cl.height);
-			cl.operateRect(0, 0, comp.cl, 0, 0, cl.width, cl.height, omAuto, 255);
-			cl.fillRect(cl.width/2-1, cl.height/2-1, 2, 2, 0xffff0000);
-			cl.face = comp.cl.face;
-			cl.type = comp.cl.type;
+			operateRect(0, 0, comp, 0, 0, .width, .height, omAuto, 255);
 		}
-
-		operateRect(0, 0, comp, 0, 0, comp.width, comp.height, omAuto, 255);
-
-	//	if(doing)
-	// 最低一回発行しておく
 		SharedContinuousHandler_object.entry(this,16,'onTimerLayerMover', true);
 	}
 
 /*
 / @ 文字描画
 */
-	function drawText(x, y, text, col, opa=255, aa=true, sl=255, sc=0, sw=0, sofx=0, sofy=0) {
+	function drawText(x, y, text, col, opa=255, aa=true, sl=255, esC=0, eeX, sX=0, sY=0) {
 		ch_width = font.getTextWidth(text);	// 親文字の幅
 		ch_height = font.getTextHeight(text);
+
+		if(ruby!="" || text.length >=2) {
+			flag_GradComplexChar = true;	// 複雑な文字描画
+		}
 
 		calcRubyPos(x, y);	// ルビ計算
 		x += expandX; y += expandY;	// 位置補正
@@ -414,6 +416,9 @@ class FadeChLayer extends FadeLayer {
 
 		// ※親文字字間拡張機能
 		var rubywidth = 0; // とりあえず：親文字の字間を開ける機能。ルビの長さ
+// 
+// 
+// ml.r_ChColor
 
 		// ルビ
 		if(ruby!="") {
@@ -421,12 +426,16 @@ class FadeChLayer extends FadeLayer {
 			rubywidth = font.getTextWidth(ruby); // ※親文字字間拡張機能用
 			if(rubymode=="e" && text.length>1 && ch_width>rubywidth) {	// 均等割り付け
 				for(var i=0; i<ruby.length; i++) {
-					drawTextWithGrad(rx, ry, ruby[i], col, opa, aa, sl, sc, sw, sofx, sofy);
+					drawTextWithGrad(rx, ry, ruby[i], 
+						ml.r_ChColor, opa, aa, sl, 
+						(ml.edge?ml.r_EdgeColor:ml.r_ShadowColor), eeX, sX, sY);
 					if(vertical) {	ry += span + font.getTextWidth(ruby[i]); }
 					else {		 	rx += span + font.getTextWidth(ruby[i]); }
 				}
 			} else {			// 均等割り付け以外
-				drawTextWithGrad(rx, ry, ruby, col, opa, aa, sl, sc, sw, sofx, sofy);
+				drawTextWithGrad(rx, ry, ruby, 
+					ml.r_ChColor, opa, aa, sl, 
+					(ml.edge?ml.r_EdgeColor:ml.r_ShadowColor), eeX, sX, sY);
 			}
 			onRubyPhase(false);
 		}
@@ -445,16 +454,16 @@ class FadeChLayer extends FadeLayer {
 					changedChLinePos(textExpandLength/2,0); x -= expandX-rx-textExpandOverflow;
 				}
 				for(var i=0; i<text.length; i++) {
-					drawTextWithGrad(x, y, text[i], col, opa, aa, sl, sc, sw, sofx, sofy);
+					drawTextWithGrad(x, y, text[i], col, opa, aa, sl, esC, eeX, sX, sY);
 					if(vertical) {	y += parentspan + font.getTextWidth(text[i]); }
 					else {			x += parentspan + font.getTextWidth(text[i]); }
 				}
 			} else {
 				textExpandLength = 0;
-				drawTextWithGrad(x, y, text, col, opa, aa, sl, sc, sw, sofx, sofy);
+				drawTextWithGrad(x, y, text, col, opa, aa, sl, esC, eeX, sX, sY);
 			}
 		} else {
-			drawTextWithGrad(x, y, text, col, opa, aa, sl, sc, sw, sofx, sofy);
+			drawTextWithGrad(x, y, text, col, opa, aa, sl, esC, eeX, sX, sY);
 		}
 
 		name = text;
@@ -472,10 +481,12 @@ class FadeChLayer extends FadeLayer {
 		show(left - slantMoveX, top - slantMoveY, , (skip?0:deffadetime) ) if !doing;
 	}
 
-	function drawGraph(cx, cy, lay, color, ischar, edge, shadow, ee, esC, eEm, sX, sY) {
+	function drawGraph(cx, cy, lay, color, ischar, edge, shadow, eeX, esC, eEm, sX, sY) {
 	// putGraph から
 		ch_width = lay.imageWidth;	// 親文字の幅
 		ch_height = lay.imageHeight;
+
+		flag_GradComplexChar = true;	// 複雑な文字
 
 		calcRubyPos(cx, cy);	// ルビ計算
 
@@ -488,28 +499,46 @@ class FadeChLayer extends FadeLayer {
 		if(ruby!="") {
 			onRubyPhase(true);
 			if(vertical) { rx += ch_width; }
-			drawTextWithGrad(rx, ry, ruby, color, 255, ml.antialiased, eEm, esC, ee, sX, sY);
+			if(edge) {
+				drawTextWithGrad(rx, ry, ruby, 
+						ml.r_ChColor, 255, ml.antialiased, eEm, 
+						ml.r_EdgeColor, eeX, sX, sY);
+			} else if(shadow) {
+				drawTextWithGrad(rx, ry, ruby, 
+						ml.r_ChColor, 255, ml.antialiased, eEm, 
+						ml.r_ShadowColor, eeX, sX, sY);
+			} else {
+				drawTextWithGrad(rx, ry, ruby, 
+						ml.r_ChColor, 255, ml.antialiased, 0, 
+						0, 0, 0, 0);
+			}
 			onRubyPhase(false);
 		}
 
 		if(ischar && (edge || shadow)) {
-			drawGraphShadow(cx, cy, lay, color, ischar, edge, shadow, ee, esC, eEm, sX, sY);
-			operateRect(0, 0, cl, 0, 0, width, height, omAlpha, 255);
 			if(ml.chGradObj.doChGrad) {
-				initGradChLayer();
-				GradChLayer.operateRect(0, 0, cl, 0, 0, width, height, omAlpha, 255);
-				OperateGradationBase(cx, cy, ch_width, ch_height, ee, sX, sY);
-
 				var gColor = color, gEdgeColor = esC;
+
+				initGradComplexLayer();
+
+				if(ml.chGradObj.ch) { gColor = 0xffffff; }
+				if(ml.chGradObj.edge) { gEdgeColor = 0xffffff; }
+				drawGraphCh(cx, cy, lay, gColor, ischar, edge, shadow, eeX, gEdgeColor, eEm, sX, sY);
+				GradChLayer.operateRect(0, 0, cl, 0, 0, width, height, omAlpha, 255);
+
+				OperateGradationBase(cx, cy, ch_width, ch_height, eeX, sX, sY);
+
 				if(ml.chGradObj.ch) { gColor = 0x000000; }
 				if(ml.chGradObj.edge) { gEdgeColor = 0x000000; }
-				drawGraphShadow(cx, cy, lay, gColor, ischar, edge, shadow, ee, gEdgeColor, eEm, sX, sY);
+				drawGraphCh(cx, cy, lay, gColor, ischar, edge, shadow, eeX, gEdgeColor, eEm, sX, sY);
 
 				// 比較(明)合成で、影とグラデを合成
-				GradChLayer.operateRect(0, 0, cl, 0, 0, this.width, this.height, omLighten, 255); 
+				GradChLayer.operateRect(0, 0, cl, 0, 0, this.width, this.height, omPsLighten, 255); 
 
-				this.operateRect(0, 0, GradChLayer, 0, 0, width, height, omAlpha, 255);	// 加算合成
-				finalizeGradChLayer();
+				finalizeGradComplexLayer();
+			} else {
+				drawGraphCh(cx, cy, lay, color, ischar, edge, shadow, eeX, esC, eEm, sX, sY);
+				operateRect(0, 0, cl, 0, 0, width, height, omAlpha, 255);
 			}
 		} else {
 			this.operateRect(cx, cy, lay, 0, 0, width, height, omAlpha, 255);
@@ -525,11 +554,10 @@ class FadeChLayer extends FadeLayer {
 		show(left - slantMoveX, top - slantMoveY, , (skip?0:deffadetime)) if !doing;
 	}
 
-	function drawGraphShadow(cx, cy, lay, color, ischar, edge, shadow, ee, esC, eEm, sX, sY) {
+	function drawGraphCh(cx, cy, lay, color, ischar, edge, shadow, ee, esC, eEm, sX, sY) {
 		with(cl) {	// edge・shadowの種を生成
 			.holdAlpha = true;
-			.type = this.type;
-			.setPos(0, 0, this.width, this.height);
+			.setSize(this.width, this.height);
 			.fillRect(0, 0, .width, .height, 0x00000000);
 			.copyRect(cx, cy, lay, 0, 0, lay.width, lay.height);
 			.face = dfOpaque;
@@ -539,8 +567,8 @@ class FadeChLayer extends FadeLayer {
 
 		var tmp = new global.FadeLayer(window, this);
 		with(tmp) {
+			.holdAlpha = true;
 			.face = this.face;
-			.holdAlpha = this.holdAlpha;
 			.type = this.type;
 			.setPos(0,0, this.width, this.height);
 			.fillRect(0, 0, .width, .height, 0x00000000);
@@ -553,7 +581,7 @@ class FadeChLayer extends FadeLayer {
 			for(var i=0;i<n;i++){
 				tmp.operateRect(0, 0, cl, 0, 0, cl.width, cl.height, omAddAlpha, 128);
 			}
-			cl.copyRect(0, 0, tmp, 0, 0, this.width, this.height);
+			cl.copyRect(0, 0, tmp, 0, 0, cl.width, cl.height);
 		} else if(shadow) {
 			cl.copyRect(sX, sY, cl, 0, 0, cl.width, cl.height);	// ずらす
 		}
@@ -563,13 +591,12 @@ class FadeChLayer extends FadeLayer {
 			.fillRect(0, 0, .width, .height, 0x00000000);
 			.copyRect(cx, cy, lay, 0, 0, lay.width, lay.height);
 			.face = dfOpaque;
-			.holdAlpha = true;
 			.fillRect(0, 0, .width, .height, color);
 			.face = this.face;
 		}
 
 		// エッジ・影の上に画像を張り付け
-		cl.operateRect(0, 0, tmp, 0, 0, this.width, this.height, omAlpha, 255);
+		cl.operateRect(0, 0, tmp, 0, 0, cl.width, cl.height, omAlpha, 255);
 
 		invalidate tmp;
 	}
@@ -584,10 +611,10 @@ class FadeChLayer extends FadeLayer {
 
 		if(ruby!="") {
 			// 縦書きのｘは右上なので、ルビ計算用のxを修正
-			var rubybase = fontsize > ch_height ? (fontsize+ch_height)/2:ch_height;
+			var rubybase = font.height > ch_height ? (font.height+ch_height)/2:ch_height;
 			font.angle = 2700;	// calcRubyPosはアングルを計算に入れないので、ここで変更
 			// ルビの位置はhchcurrentの補正を受けてはいけないので、ここで減算
-			calcRubyPos(x + rubybase - parent.hchCorrect, y);
+			calcRubyPos(x + rubybase - ml.hchCorrect, y);
 			x += expandX; y += expandY;	// 位置補正
 
 			ch_left = x;
@@ -595,7 +622,9 @@ class FadeChLayer extends FadeLayer {
 
 			onRubyPhase(true);
 			font.angle = 2700;
-			drawTextWithGrad(rx, ry, ruby, col, opa, aa, sl, sc, sw, sofx, sofy);
+			drawTextWithGrad(rx, ry, ruby, 
+				ml.r_ChColor, opa, aa, sl, 
+				(ml.edge?ml.r_EdgeColor:ml.r_ShadowColor), sw, sofx, sofy);
 
 			flag_hch = true;
 			onRubyPhase(false);
@@ -630,19 +659,20 @@ class FadeChLayer extends FadeLayer {
 			return;
 		}
 
-		if(!ml.chGradObj.doChGrad
-		  || ( !(ml.chGradObj.ch || ml.chGradObj.edge) && flag_ch )
-		  || ( !(ml.chGradObj.ch || ml.chGradObj.edge) && flag_hch )
-		  || ( !ml.chGradObj.ruby && flag_ruby )  ) {
-			drawTextPlain(...);
-			return;
+		with(ml.chGradObj) { 
+			if(!.doChGrad
+			  || ( !.ch && !.edge && (flag_ch || flag_hch) )
+			  || ( !.ruby && flag_ruby )  ) {
+				drawTextPlain(...);
+				return;
+			}
 		}
 
 		// ChGrad
 		var save_visible = this.visible;
 		this.visible = false;
 
-		initGradChLayer();
+		initGradComplexLayer();
 
 		// eachCh
 		// 文字グラデを全文字描画 → エッジを描画
@@ -664,48 +694,68 @@ class FadeChLayer extends FadeLayer {
 			restrictGradEffectOnChAndEdge(x, y, text, col, opa, aa, sl, sc, sw, sofx, sofy);
 		}
 
-		this.operateRect(0, 0, GradChLayer, 0, 0, width, height, omAlpha, 255);	// 加算合成
-
-		finalizeGradChLayer();
+		finalizeGradComplexLayer();
 
 		this.visible = save_visible;
 	}
 
 	function drawGradCh(x, y, text, col, opa=255, aa=true, sl=255, sc=0, ee=0, sofx=0, sofy=0) {
-		GradChLayer.drawTextPlain(x, y, text, col, opa, aa, sl, sc, ee, sofx, sofy);
+		// グラデを掛けないところをあらかじめ黒にしておく
+		var gColor = 0x000000, gEdgeColor = 0x000000;
+		if(ml.chGradObj.ch) { gColor = 0xFFFFFF; }
+		if(ml.chGradObj.edge) { gEdgeColor = 0xFFFFFF; }
+		GradChLayer.drawTextPlain(x, y, text, gColor, opa, aa, sl, gEdgeColor, ee, sofx, sofy);
 
-		// 描画の高速化のため、制約を設ける
+		// 描画の高速化のため、生成するグラデの大きさには制約を設ける
+		var tw = font.getTextWidth(text);
+		var min_WH = tw;
+
 		if(vertical && !flag_hch) {
-			OperateGradationBase(x-font.height, y, font.height, font.height, ee, sofx, sofy);
-//			OperateGradationBase(x-font.height, y, font.getTextHeight(text), font.getTextWidth(text), ee, sofx, sofy);
+//			// Shift-JISのみ - 要らない？
+//			if(text.length==1 & text<='ﾟ' & '!'<=text ) {
+//				// アルファベットなどは横向きに表示されるので、縦仕様で表現。
+//				tw = font.getTextHeight(text);
+//			}
+			if(min_WH < font.height) {	// 細長い文字のとき
+				min_WH = font.height;
+				y -= (min_WH-tw)/2;
+			}
+			OperateGradationBase(x-font.height, y, font.height, min_WH, ee, sofx, sofy);
 		} else {
-			OperateGradationBase(x, y, font.height, font.height, ee, sofx, sofy);
-//			OperateGradationBase(x, y, font.getTextWidth(text), font.getTextHeight(text), ee, sofx, sofy);
+			if(min_WH < font.height) {	// 細長い文字のとき
+				min_WH = font.height;
+				x -= (min_WH-tw)/2;
+			}
+			OperateGradationBase(x, y, min_WH, font.height, ee, sofx, sofy);
 		}
 	}
 
 	function restrictGradEffectOnChAndEdge(x, y, text, col, opa=255, aa=true, sl=255, sc=0, ee=0, sofx=0, sofy=0) {
-		if(sc === 0x000000 && col === 0x000000) {
-			return;
-		}
-		// 現在までの描画結果を取っておく
-		cl.setSize(this.width, this.height);
-//		cl.fillRect(0, 0, cl.width, cl.height, 0x00000000);
-		cl.copyRect(0, 0, GradChLayer, 0, 0, this.width, this.height);
+		// 特殊なケース。不要。
+//		if(sc === 0x000000 && col === 0x000000) {
+//			return;
+//		}
 
-//		// 比較(明)合成で使うので、グラデーションを保持する部分は黒
-//		GradChLayer.fillRect(0, 0, this.width, this.height, 0x00000000);
-
+		// グラデ画像はグラデを掛けないところが黒くなっているので
+		// グラデを掛けたいところだけを黒にした文字と比較(明)合成することで
+		// 確実にグラデとその他の色が合成される
 		var gColor = col, gEdgeColor = sc;
 		if(ml.chGradObj.ch) { gColor = 0x000000; }
-		if(ml.chGradObj.edge) { gEdgeColor = 0x000000; }
-		GradChLayer.drawTextPlain(x, y, text, gColor, opa, aa, sl, gEdgeColor, ee, sofx, sofy);
+		if(ml.chGradObj.edge) { gEdgeColor = 0xFFFFFF; sl=0; ee=0; sofx=0; sofy=0; }
 
-		// 比較(明)合成で、影とグラデを合成
-		GradChLayer.operateRect(0, 0, cl, 0, 0, this.width, this.height, omLighten, 255); 
-
-		// cl全域をクリア
-//		cl.fillRect(0, 0, cl.width, cl.height, 0x00000000);
+		with(cl) {
+			.face = dfAlpha; .type = type;
+			with(cl.font) {
+				.angle = font.angle; .italic = font.italic;
+				.strikeout = font.strikeout; .underline = font.underline;
+				.height = font.height; .bold = font.bold; .face = font.face;
+			}
+			.setSize(this.width, this.height);
+			.fillRect(0, 0, .width, .height, 0x00000000);
+			.drawText(x, y, text, gColor, opa, aa, sl, gEdgeColor, ee, sofx, sofy);
+			.face = face;
+		}
+		GradChLayer.operateRect(0, 0, cl, 0, 0, this.width, this.height, omPsLighten, 255); 
 	}
 
 	function OperateGradationBase(x, y, w, h, ee, sofx, sofy) {
@@ -714,20 +764,6 @@ class FadeChLayer extends FadeLayer {
 		var g_x=x, g_y=y, g_w=w, g_h=h;
 		var p_x=0, p_y=0, p_w=w, p_h=h;
 		var r = 0;
-
-/*
-		if(!ml.chGradObj.eachCh && ruby==="") {
-			if(vertical) {
-				ry = 0;
-				rx = int(x + ml.rubySize + ml.rubyOffset);
-			} else {
-				rx = 0;
-				ry = int(y - ml.rubySize - ml.rubyOffset);
-			}
-			rx += expandX;
-			ry += expandY;
-		}
-*/
 
 		if(ml.chGradObj.withRuby) {
 			if(vertical) {
@@ -824,32 +860,43 @@ class FadeChLayer extends FadeLayer {
 */
 	// ルビを描画中か否かをセットする
 	function onRubyPhase(flag) {
-		if(flag) {
-			flag_ruby = true;
-			font.face=rubyface; font.bold=rubybold; font.height=rubysize;
-		} else {
-			flag_ruby = false;
-			font.face=fontface; font.bold=fontbold; font.height=fontsize;
+		with(font) {
+			if(flag) {
+				flag_ruby = true;
+				.face=ml.r_UserFace; .bold=ml.r_Bold; .height=ml.rubySize;
+			} else {
+				flag_ruby = false;
+				.face=ll.font.face; .bold=ll.font.bold; .height=ll.font.height;
+			}
 		}
 	}
 
-	function initGradChLayer() {
+	// 複雑な文字列を描画するとき用
+	function initGradComplexLayer() {
 		// グラデ描画用Chレイヤ
-		GradChLayer = ml.getFadeChLayer();
-		with(GradChLayer) {
-			.face = this.face;
-			.holdAlpha = this.holdAlpha;
-			.type = this.type;
-			.setPos(0,0, this.width, this.height);
-			.fillRect(0, 0, .width, .height, 0x00000000);
-			.font.height=font.height; .font.bold=font.bold; .font.face=font.face;
+		GradChLayer = this;
+		if(flag_GradComplexChar) {
+			GradChLayer = ml.getFadeChLayer();
+			with(GradChLayer) {
+				.face = this.face;
+				.holdAlpha = this.holdAlpha;
+				.type = this.type;
+				.setPos(0,0, this.width, this.height);
+				.fillRect(0, 0, .width, .height, 0x00000000);
+				.font.height=font.height; .font.bold=font.bold; .font.face=font.face;
+			}
 		}
 	}
 
-	function finalizeGradChLayer() {
-		GradChLayer.stopLayerMoving();
-		GradChLayer.resetChLayer();
-		ml.putFadeChLayer(GradChLayer);
+	// 複雑な文字列のときのみ処理
+	function finalizeGradComplexLayer() {
+		if(flag_GradComplexChar) {
+			this.operateRect(0, 0, GradChLayer, 0, 0, width, height, omAlpha, 255);	// 加算合成
+
+			GradChLayer.stopLayerMoving();
+			GradChLayer.resetChLayer();
+			ml.putFadeChLayer(GradChLayer);
+		}
 	}
 
 	function drawTextPlain(x, y, text, col, opa, aa, sl, sc, sw, sofx, sofy) {
