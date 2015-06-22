@@ -397,6 +397,7 @@ class FadeChLayer extends FadeLayer {
 /*
 / @ 文字描画
 */
+	// 文字描画の起点
 	function drawText(x, y, text, col, opa=255, aa=true, sl=255, esC=0, eeX, sX=0, sY=0) {
 		ch_width = font.getTextWidth(text);	// 親文字の幅
 		ch_height = font.getTextHeight(text);
@@ -413,9 +414,6 @@ class FadeChLayer extends FadeLayer {
 
 		// ※親文字字間拡張機能
 		var rubywidth = 0; // とりあえず：親文字の字間を開ける機能。ルビの長さ
-// 
-// 
-// ml.r_ChColor
 
 		// ルビ
 		if(ruby!="") {
@@ -478,6 +476,7 @@ class FadeChLayer extends FadeLayer {
 		show(left - slantMoveX, top - slantMoveY, , (skip?0:deffadetime) ) if !doing;
 	}
 
+	// グラフ描画の起点
 	function drawGraph(cx, cy, lay, color, ischar, edge, shadow, eeX, esC, eEm, sX, sY) {
 	// putGraph から
 		ch_width = lay.imageWidth;	// 親文字の幅
@@ -551,6 +550,7 @@ class FadeChLayer extends FadeLayer {
 		show(left - slantMoveX, top - slantMoveY, , (skip?0:deffadetime)) if !doing;
 	}
 
+	// グラフを文字扱いで描画するときにエッジ・影を描くところ
 	function drawGraphCh(cx, cy, lay, color, ischar, edge, shadow, ee, esC, eEm, sX, sY) {
 		with(cl) {	// edge・shadowの種を生成
 			.holdAlpha = true;
@@ -598,6 +598,7 @@ class FadeChLayer extends FadeLayer {
 		invalidate tmp;
 	}
 
+	// 縦中横の起点
 	function drawHCHText(x, y, text, col, opa=255, aa=true, sl=255, sc=0, sw=0, sofx=0, sofy=0) {
 		flag_hch = true;
 
@@ -649,6 +650,8 @@ class FadeChLayer extends FadeLayer {
 /*
 / @ 文字グラデーション
 */
+	// グラデーション付の文字を描くか判断する。
+	// 
 	function drawTextWithGrad(x, y, text, col, opa=255, aa=true, sl=255, sc=0, sw=0, sofx=0, sofy=0) {
 		if(__flag_ChGradRecter_OBJECT_DEFINED__==0) {
 			// ChGradが入ってない
@@ -696,6 +699,7 @@ class FadeChLayer extends FadeLayer {
 		this.visible = save_visible;
 	}
 
+	// 
 	function drawGradCh(x, y, text, col, opa=255, aa=true, sl=255, sc=0, ee=0, sofx=0, sofy=0) {
 		// グラデを掛けないところをあらかじめ黒にしておく
 		var gColor = 0x000000, gEdgeColor = 0x000000;

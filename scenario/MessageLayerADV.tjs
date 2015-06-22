@@ -1398,6 +1398,7 @@ class ChGradRecter extends RecterPlugin {
 		comp_param = %[];
 
 		base_param_arr.assign(elm);
+		base_param_arr.redraw = true;
 		method = elm.method!==void ? elm.method : def_method;
 
 		ch = elm.ch!==void ? elm.ch : def_ch;
@@ -1432,7 +1433,9 @@ class ChGradRecter extends RecterPlugin {
 	}
 
 	function resetChGrad() {
+		base_param_arr.clear();
 		base_param_arr.assign(def_base_param_arr);
+		base_param_arr.redraw = true;
 		method = def_method;
 
 		ch = def_ch;
@@ -1512,13 +1515,14 @@ class ChGradRecter extends RecterPlugin {
 			}
 		}
 
-		if(redraw) {
+		if(redraw || base_param_arr.redraw) {
 			(Dictionary.assign incontextof comp_param)(elm);	// èåèÉRÉsÅ[
 			elm.absolute = 1;
 			elm.hide = true;
 			super.set(elm);
 			showLayer.visible = false;
 			transLayer.visible = false;
+			base_param_arr.redraw = false;
 		}
 	}
 
