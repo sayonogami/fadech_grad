@@ -1321,12 +1321,36 @@ function parseColor2Array(color) {
 }
 
 /*-----------------------------------------------------------------------------
+/ @	十進数色指定を十六進数色指定にする
+/	255, 255, 0, 255 => 0xFFFF00FF
+/	   , 255, 0, 255 => 0xFF00FF
+/----------------------------------------------------------------------------*/
+function ten2sixt(a, b, c, d) {
+	return (a<<24)|(b<<16)|(c<<8)|d;
+}
+
+function toHEX(r, g, b) {
+	return (r<<16)|(g<<8)|(b);
+}
+
+/*-----------------------------------------------------------------------------
+/ @	十六進数色指定を十進数色指定にする
+/		[r, g, b] の配列を返す
+/	0xFF00FF => [255, 0, 255]
+/----------------------------------------------------------------------------*/
+function toRGB( p ) {
+	return [ (p & 0xff0000)>>>0x10, (p & 0x00ff00)>>>0x08, (p & 0x0000ff)>>>0x00 ];
+}
+
+/*-----------------------------------------------------------------------------
 / @	前 -> 後ろの順で選択する	Ver.0.10
 /	i に値があるなら i、無いなら els を返す
 /----------------------------------------------------------------------------*/
 function autoSelect(i, els) {
 	return i!==void ? i : els;
 }
+
+
 }
 
 /*--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=-
@@ -1365,10 +1389,10 @@ class ChGradRecter extends RecterPlugin {
 	var def_base_param_arr = new Array();
 	var def_method = "Rect";
 	var def_ch = false;		// デフォルト
-	var def_ruby = false;
 	var def_edge = false;
+	var def_ruby = true;
 	var def_withRuby = false;
-	var def_withEdge = false;
+	var def_withEdge = true;
 	var def_eachCh = true;
 
 	function ChGradRecter(window, plgName) {
