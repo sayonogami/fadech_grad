@@ -26,83 +26,44 @@ Scripts.execStorage("MessageLayerADV.tjs");
 *syokai_start|メニュー
 @startanchor
 ;* ADD
-;@position vertical=true
-;@deffont rubyconfig face="@ＭＳ Ｐ明朝" size=24 bold=false rubyface="@ＭＳ ゴシック" rubysize=12
-@deffont rubyconfig face="ＭＳ Ｐ明朝" size=24 bold=false rubyface="ＭＳ ゴシック" rubysize=12 Rbold=false Rcolor=0x00FFFF
+@deffont rubyconfig face="ＭＳ Ｐ明朝" size=24 bold=false rubyface="ＭＳ ゴシック" rubysize=12 Rbold=false Rcolor=0xFFFFFF
+@deffont rubyconfig color=0xffffff shadow=false shadowcolor=0xffff00 shadowoffsetx=3 shadowoffsety=3 edge edgecolor=0xff0000 edgeextent=2 edgeemphasis=1024
 @resetfont
 
-
-@deffont rubyconfig color=0xffffff shadow=false shadowcolor=0xffffff shadowoffsetx=3 shadowoffsety=3 edge edgecolor=0xff0000 edgeextent=2 edgeemphasis=1024
-;@setDefaultChGradation color="0xFF0000,0xFF0000,0xFF0000,0xFFFFFF,0xFF0000,0xFF0000,0xFF0000" method="Rect" recttype=2 ch=false edge
-
-;@font edge color=0xffffff shadow=false edgecolor=0x00ffff edgeextent=2 edgeemphasis=2048
-;@setDefaultChGradation color="0xFFFFFF,0xFF0000,0xFFFFFF,0xFFFFFF,0xFFFFFF,0xFFFFFF,0xFFFFFF" method="Circle" ch=false edge withEdge
-
+@setDefaultChGradation color="0xFF0000,0xFF0000,0xFF0000,0xFFFFFF,0xFF0000,0xFF0000,0xFF0000" method="Rect" recttype=1 ch=false edge
 @resetChGradation
-@resetfont
 
-
-
-; 背景に画像を読み込み、メッセージレイヤにメニューを描画
 @backlaych
 @image layer="base" storage="mori" page=back
-
 @current page=back
-
 @cm
+
 @layopt layer=message0 page=back visible=true
 @nowait
 @history output=false
 @style align=center
-
-@setChGradation color="0xFF0000,0xFF0000,0xFF0000,0xFFFFFF,0xFF0000,0xFF0000,0xFF0000" method="Rect" recttype=1 ch=false edge
-[font size=40]FadeChGradationの紹介[resetfont][r]
+[r][r][r][r]
+[link target="*about"]FadeCh with Gradationの紹介[endlink][r]
+[r][r][r][r][r][r]
+[link exp="System.shellExecute('http://koumei.rejec.net/')" hint="サークル煌明のホームページを開きます"]サークル煌明のホームページへ[endlink][r]
 [r]
+[link exp="kag.shutdown()" color=0xff0000 hint="終了します"]終了[endlink]
 
-@font edge edgecolor=0x000000
-@setChGradation color="0xFF0000,0x00FFFF,0x000000" method="Circle" ch edge=false
-[link target="*about"]サンプルを見る[endlink][r]
-たとえば→graphで[graph storage="ExQuestion.png" alt="!?"]したり文字で[ch_!?]したり[r]
-[r]
-@setDefaultChGradation color="0x228BFF,0x006400,0x0000ff" method="Rect" recttype=3 rot=30 ch=false edge
-@deffont rubyconfig color=0xffffff edge shadow=false edgecolor=0xff0000 edgeextent=2 edgeemphasis=2048
-@resetChGradation
-@resetfont
-
-@style align=left
-　[傍][r_・]あ[r_・]ま[r_・]ん[r_・]じ[r_・]や[r_・]く[/傍]は[r_すなわち]即、土地の精霊で、日本紀には、[r_アマ]天[訓仮名]ノ[/訓仮名][r_サグメ][ch_探女]として其話があり、[ch_古事記]や[ch_万葉集]にも見える。[r]
-
-　やはり、何にでも邪魔を入れる、といふ名ま[r_え]へであらう。[r]
-
-　神々が土地を開拓しようとする時、邪魔をするのは、何時も天[訓仮名]ノ[/訓仮名]探女である。[r_すなわち]即、土地の精霊なのである。[r]
-
-　[r_この]此天[訓仮名]ノ[/訓仮名]探女は、実に日本芸術の発足の源をなして[r_イ]ゐるものである。
-@style align=center
-[r]
-[graph storage="べしみ"][graph storage="べしみ"][graph storage="べしみ"][r]
-[r]
-@font bold edge edgecolor=0x00FF00
-@setChGradation color="0xFF0000,0xFF0000,0xFF0000,0xFFFFFF,0x0000FF,0x0000FF,0x0000FF" method="Rect" recttype=3 dir=45 ch edge=false
-[link exp="kag.shutdown()" color=0xff0000 hint="吉里吉里/KAGの紹介を終了します"]★終了★[endlink]
 @endnowait
 @history output=true
 @current page=fore
 
-; メッセージレイヤのトランジション
 @trans method=crossfade time=800
 @wt
 
-; 通過記録
 @record
-
-; 選択肢が選択されるまで停止
 @s
 
 *to_syokai_start
 ; syokai_start に戻る
-@backlaych
-@layopt layer=message0 page=back visible=false
-@transx
+;@backlaych
+;@layopt layer=message0 page=back visible=false
+;@transx
 @jump target=*syokai_start
 
 *about|
@@ -209,7 +170,7 @@ Scripts.execStorage("MessageLayerADV.tjs");
 @pgt
 
 猿楽では[傍]をかし[/傍]といひ、延年舞では[傍]もどき[/傍]と称して、所謂[傍]もどき開口[/傍]の儀式をする者がある。[傍]もどき[/傍]が、殊に有力な働きをするのは田楽で、随つて寺院の舞踊に這入つてゐる。[傍]ひよつとこ[/傍]は、その最近くまで残つた形である。[傍]もどき[/傍]は即「もどく」意で、反対する事を現す。日本の芸術では、歌の掛け合ひから既に[傍]もどき[/傍]である。神と精霊との問答が、歌垣となつたのである。源に溯ると、あらゆる方面に[傍]もどき[/傍]が現れてゐる。[lr]
-能楽の面に[r_オホ]大[r_ベシミ][graph storage="べしみ"]と言ふのがあるが、[r_ベシミ][graph storage="べしみ"]は「へしむ」といふ動詞から出た名詞で、口を拗り曲げてゐる様である。神が土地の精霊と問答する時、精霊は容易に口を開かない。尤、物を言はない時代を越すと、口を開くやうにもなつたが、返事をせないか、或は反対ばかりするかであつて、此二つの方面が、[r_オホ]大[r_ベシミ][graph storage="べしみ"]の面に現れてゐるのだ。一体日本には、古くから面のあつたことを示す証拠はある。併し、外来の面が急速に発達した為、在来の面は、其影を潜めたのである。
+能楽の面に[r_r_オホ]大[r_l_ベシミ][graph storage="べしみ"]と言ふのがあるが、[r_ベシミ][graph storage="べしみ"]は「へしむ」といふ動詞から出た名詞で、口を拗り曲げてゐる様である。神が土地の精霊と問答する時、精霊は容易に口を開かない。尤、物を言はない時代を越すと、口を開くやうにもなつたが、返事をせないか、或は反対ばかりするかであつて、此二つの方面が、[r_オホ]大[r_ベシミ][graph storage="べしみ"]の面に現れてゐるのだ。一体日本には、古くから面のあつたことを示す証拠はある。併し、外来の面が急速に発達した為、在来の面は、其影を潜めたのである。
 
 @pgt
 
@@ -226,3 +187,7 @@ Scripts.execStorage("MessageLayerADV.tjs");
 かうした鬼を扱ふ方法を、昔の人々はよく知つてゐた。[傍]あるじ[/傍]と言ふ語は、[傍]まれびと[/傍]即、常世神に対する馳走を意味する。日本の宴会には後世まで、古代の神祭りの儀式のなごりが、沢山遺つてゐる。武家の間で馳走の時、[傍]おに[/傍]と言ふ名の役が出た事も、かうして見て初めて意味がよく訣る。[lr]
 [傍]まれびと[/傍]なる鬼が来た時には、出来る限りの款待をして、悦んで帰つて行つてもらふ。此場合、神或は鬼の去るに対しては、なごり惜しい様子をして送り出す。即、村々に取つては、よい神ではあるが、長く滞在されては困るからである。だから、次回に来るまで、再、戻つて来ない様にするのだ。かうした神の観念、鬼の考へが、天狗にも同様に変化して行つたのは、田楽に見える処である。
 
+@pgt
+
+
+@jump target=*to_syokai_start
