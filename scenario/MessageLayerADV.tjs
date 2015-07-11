@@ -728,6 +728,7 @@ class MessageLayerADV extends MessageLayer {
 			__ch.assign(comp.processedfadeChLayers[i]);
 		}
 		movingCh = comp.movingCh;
+
 		if(canChGrad) {
 			chGradObj.assign(comp.chGradObj);
 		}
@@ -737,7 +738,9 @@ class MessageLayerADV extends MessageLayer {
 	{
 		super.exchangeInfo();
 
-		chGradObj.pluginName <-> comp.chGradObj.pluginName;
+		if(canChGrad) {
+			chGradObj.pluginName <-> comp.chGradObj.pluginName;
+		}
 	}
 
 
@@ -1474,6 +1477,8 @@ class ChGradRecter extends RecterPlugin {
 
 	function assign(src) {
 		base_param_arr.assign(src.base_param_arr);
+		base_param_arr.redraw = true;
+
 		method = src.method;
 		ch = src.ch;
 		edge = src.edge;
