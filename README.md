@@ -1,7 +1,8 @@
 # fadech_grad
 吉里吉里で文字のグラデーションを行うプラグインです。  
-*作りかけです。  
-[graph]タグを使用した文字中画像にも対応しています。  
+[詳しい説明はこちらに記載してあります](http://koumei.rejec.net/html/exp_fadechGrad.html "サークル煌明のサイト")
+
+[graph]タグを使用した文字中画像、レンダリング済みフォントにも対応しています。  
 
     @setChGradation color="0xFF0000,0x0000FF" method="Circle" edge ch=false  
 文字のエッジを、真ん中が赤、外側が青の円形グラデーションにします  
