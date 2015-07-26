@@ -83,10 +83,10 @@ class FadeChLayer extends FadeLayer {
 
 		deffadetime = ml.chfadetime;
 		with(cl = new global.FadeLayer(window, this)) {
+			.face = dfAuto;
+			.type = ll.type;
 			.setPos(0, 0, width, height);
 			.fillRect(0, 0, width, height, 0x00000000);
-			.face = dfAuto;
-			.type = ltAddAlpha;
 		}
 		resetChLayer();
 	}
@@ -129,6 +129,9 @@ class FadeChLayer extends FadeLayer {
 		r_cw = _dw;
 		r_ch = _dh;
 		visible = true;
+
+		cl.type = type;
+		cl.face = dfAuto;
 	}
 
 	function resetChLayer() {

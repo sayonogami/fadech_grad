@@ -301,13 +301,13 @@ class FadeLayer extends Layer {
 /* ----------------------------------------------------------
 / @‚»‚Ì‘¼
 /--------------------------------------------------------- */
-/*
+
 	function moveCursorOnMe(time=sf.defCursorSpeed, accel=-4) {
 		MouseCursorMover.set( %[
 			layer:this, x:width/2, y:height/2, time:time, accel:accel
 		] );
 	}
-*/
+
 	function onFocus(focused, direction) {
 		super.onFocus(...);
 	}
