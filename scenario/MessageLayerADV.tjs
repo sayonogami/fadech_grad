@@ -78,13 +78,13 @@ class MessageLayerADV extends MessageLayer {
 	var defaultChSyMoveMode = "none", defaultChSyMove;
 
 	// 前行フェードアウト
-	var chPrevLineFadeout = false;
-	var chPrevLineTime = 0;
-	var chPrevLineOpacity = 255;
+	var chPrevLineFadeout = true;
+	var chPrevLineTime = 500;
+	var chPrevLineOpacity = 128;
 	var chPrevLineDelay = 0;
-	var defaultChPrevLineFadeout = false;
-	var defaultChPrevLineTime = 0;
-	var defaultChPrevLineOpacity = 255;
+	var defaultChPrevLineFadeout = true;
+	var defaultChPrevLineTime = 500;
+	var defaultChPrevLineOpacity = 128;
 	var defaultChPrevLineDelay = 0;
 
 	var cx, cy;	// get_cx, get_cy
@@ -97,10 +97,12 @@ class MessageLayerADV extends MessageLayer {
 	var currentRubyOverflow;	// 次のchの字間拡張サイズ
 	var defaultRubyOverflow;
 
-	var id__ = 0;
+	var id__ = 0;	// fadeChレイヤのid = 通し番号
 
 	var canChGrad = false;	// 文字グラデーションが可能か
 	var chGradObj = void;
+
+	var flag_PreviousLineFadeoutStart = false;
 
 	function MessageLayerADV(owner, parent, name, id, do_config) {
 		super.MessageLayer(...);
@@ -339,8 +341,10 @@ class MessageLayerADV extends MessageLayer {
 		var inlink = inLink != -1;
 		beginLinkLine() if inlink;
 
-	// スキップ入り
-		if(processChnInF && currentCh) { forEachFadeChFinish(); }
+		// スキップ入り
+		if(processChnInF && movingCh) { forEachFadeChFinish(); }
+
+		if(flag_PreviousLineFadeoutStart) { forEachPrevChFadeout(); }
 
 		cl = getFadeChLayer();	// フェード用レイヤ
 		set_chSR(cl);
@@ -424,7 +428,6 @@ class MessageLayerADV extends MessageLayer {
 
 		if(autoReturn && (vertical?(y>relinexpos):(x>relinexpos)) )
 			if(reline()) return true;		// 改行位置に達している？
-
 
 		cl = getFadeChLayer();
 		set_chSR(cl);
@@ -640,6 +643,7 @@ class MessageLayerADV extends MessageLayer {
 
 	function putFadeChLayer(cl_) {
 	// chレイヤ を待機状態にする
+		dm("putFadeChLayer "+ cl_.__id);
 		processedfadeChLayers.remove(cl_, false);
 		fadeChLayers.add(cl_);
 		currentCh--;
@@ -708,6 +712,20 @@ class MessageLayerADV extends MessageLayer {
 		getter() {
 			// 演出をしていないならTrue、しているならFalse
 			return (kag.skipMode >= 2 || kag.actualChSpeed < 10);
+		}
+	}
+/*--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=-
+/ @前行フェードアウト
+/=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--*/
+	function setPreviousLineFadeout() {
+		flag_PreviousLineFadeoutStart = true;
+	}
+
+	function forEachPrevChFadeout() {
+		flag_PreviousLineFadeoutStart = false;
+		var str;
+		for(var i=0;i<currentCh;i++) {
+			with(processedfadeChLayers[i]) { dm(i); str += ","+.__id; .fadeout(); }
 		}
 	}
 
@@ -1667,6 +1685,12 @@ class ChGradRecter extends RecterPlugin {
 		}
 	}
 }
+
+kag.tagHandlers.setpreviouslinefadeout = function(elm) {
+	if(currentWithBack) current.comp.setPreviousLineFadeout();
+	current.setPreviousLineFadeout();
+	return 0;
+} incontextof kag;
 
 kag.tagHandlers.setchgradation = function(elm) {
 	if(currentWithBack) current.comp.chGradObj.setChGrad(elm);

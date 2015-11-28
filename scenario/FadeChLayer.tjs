@@ -26,7 +26,7 @@ Scripts.execStorage("FadeLayer.tjs");
 class FadeChLayer extends FadeLayer {
 	var __id;
 
-	// init, reset
+	// init, float, reset
 	var state;
 
 	var ll, ml;	// 親レイヤ
@@ -85,7 +85,6 @@ class FadeChLayer extends FadeLayer {
 		ml = parent;	// メッセージレイヤ
 		ll = parent.lineLayer;
 
-		deffadetime = ml.chfadetime;
 		with(cl = new global.FadeLayer(window, this)) {
 			.face = dfAuto;
 			.type = ll.type;
@@ -115,7 +114,6 @@ class FadeChLayer extends FadeLayer {
 		with(ml) {
 			vertical = .vertical;
 			textExpandOverflow = .currentRubyOverflow;
-			deffadetime = .chfadetime;
 			skip = .processChnInF;
 			fade = .ch4Fade;
 		}
@@ -323,7 +321,13 @@ class FadeChLayer extends FadeLayer {
 		if(rotMove!="n")
 			rotateText(0, 0, rad, false);
 
-		if(floated) return drawCh4Parent();
+		if(ml.chPrevLineFadeout) {
+			if(floated && fadeouted) return drawCh4Parent();
+			return false;
+		}
+		if(floated) {
+			return drawCh4Parent();
+		}
 
 		return false;
 	}
@@ -332,7 +336,7 @@ class FadeChLayer extends FadeLayer {
 		if(!visible) return false;
 
 		ml.face = dfAuto;
-		ml.operateRect(left, top, this, 0, 0, width, height);
+		ml.operateRect(left, top, this, 0, 0, width, height, omAuto, this.opacity);
 		ml.face = dfProvince;
 
 		resetChLayer();
@@ -344,6 +348,9 @@ class FadeChLayer extends FadeLayer {
 	function float() {
 	// MessageLayerに転写されるとtrueを、しなかったらfalseを返す
 		floated = true;
+		if(ml.chPrevLineFadeout) {
+			return false;
+		}
 		if(!doing) return drawCh4Parent(false);
 		return false;
 	}
@@ -483,7 +490,8 @@ class FadeChLayer extends FadeLayer {
 			rotateText(x, y, rad+radMove, true);
 		}
 
-		show(left - slantMoveX, top - slantMoveY, , (skip?0:deffadetime),,,afterLayerMoving ) if !doing;
+		dm("drawText "+ __id + "  " + text);
+		show(left - slantMoveX, top - slantMoveY, , (skip?0:ml.chfadetime),,,afterLayerMoving ) if !doing;
 	}
 
 	// グラフ描画の起点
@@ -557,7 +565,7 @@ class FadeChLayer extends FadeLayer {
 			else		 textheight -= cy;
 			rotateText(cx, cy, rad+radMove, true);
 		}
-		show(left - slantMoveX, top - slantMoveY, , (skip?0:deffadetime),,,afterLayerMoving) if !doing;
+		show(left - slantMoveX, top - slantMoveY, , (skip?0:ml.chfadetime),,,afterLayerMoving) if !doing;
 	}
 
 	// グラフを文字扱いで描画するときにエッジ・影を描くところ
@@ -654,7 +662,7 @@ class FadeChLayer extends FadeLayer {
 			rotateText(x, y, rad+radMove, true);
 		}
 
-		show(left - slantMoveX, top - slantMoveY, , (skip?0:deffadetime),,,afterLayerMoving ) if !doing;
+		show(left - slantMoveX, top - slantMoveY, , (skip?0:ml.chfadetime),,,afterLayerMoving ) if !doing;
 	}
 
 /*
@@ -865,7 +873,15 @@ class FadeChLayer extends FadeLayer {
 /*
 / @ 前行フェードアウト用
 */
-	function fadeout() {
+	function fadeout(delay = 0) {
+		fadeouted = true;
+		hide(	,
+				,
+				ml.chPrevLineOpacity,
+				(ml.processChnInF ? 0 : ml.chPrevLineTime),
+				,
+				delay,
+				afterLayerMoving);
 	}
 
 /*

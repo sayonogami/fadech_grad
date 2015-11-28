@@ -1,5 +1,6 @@
 @macro name="lr"
 	@waitfadech
+	@setpreviouslinefadeout
 	@l
 	@r
 @endmacro
