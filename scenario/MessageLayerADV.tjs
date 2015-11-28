@@ -690,13 +690,14 @@ class MessageLayerADV extends MessageLayer {
 	// より以前に登録されたレイヤが先に最終状態になる。
 	// finishLayerMoving() は転写処理が行われたらtrueを返す
 		for(var i=0;i<currentCh;i++) {
-			with(processedfadeChLayers[i]) { if(.finishLayerMoving()) i--; }
+			with(processedfadeChLayers[i]) { .finishLayerMoving(); if(.state==="reset") i--; }
 		}
 	}
 
 	function forEachFadeChClear() {
 	// すべての chレイヤ を、メッセージレイヤに内容を移すことなく待機状態に戻す
 		while(currentCh) {
+			processedfadeChLayers[-1].afterfunction = void;
 			processedfadeChLayers[-1].stopLayerMoving();
 			processedfadeChLayers[-1].resetChLayer();
 			putFadeChLayer(processedfadeChLayers[-1]);
