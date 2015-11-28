@@ -77,6 +77,16 @@ class MessageLayerADV extends MessageLayer {
 	var chSyMoveMode = "none", chSyMove;
 	var defaultChSyMoveMode = "none", defaultChSyMove;
 
+	// 前行フェードアウト
+	var chPrevLineFadeout = false;
+	var chPrevLineTime = 0;
+	var chPrevLineOpacity = 255;
+	var chPrevLineDelay = 0;
+	var defaultChPrevLineFadeout = false;
+	var defaultChPrevLineTime = 0;
+	var defaultChPrevLineOpacity = 255;
+	var defaultChPrevLineDelay = 0;
+
 	var cx, cy;	// get_cx, get_cy
 	var currentRubyAlign = "e"; // 次の文字に対するルビの割り付け方法
 
@@ -966,6 +976,12 @@ class MessageLayerADV extends MessageLayer {
 		chSxMove = +elm.sxmove if elm.sxmove !== void;
 		chSyMoveMode = elm.symovemode if elm.symovemode !== void;
 		chSyMove = +elm.symove if elm.symove !== void;
+
+	// 前行フェードアウト
+		chPrevLineFadeout = elm.plfadeout  if elm.plfadeout !== void;
+		chPrevLineTime    = +elm.pltime    if elm.pltime    !== void;
+		chPrevLineOpacity = +elm.plopacity if elm.plopacity !== void;
+		chPrevLineDelay   = +elm.pldelay   if elm.pldelay   !== void;
 	}
 
 	function setDefaultStyle(elm) {
@@ -981,7 +997,7 @@ class MessageLayerADV extends MessageLayer {
 			 : (elm.keepaddition ? defaultChSlant : 0);
 		defaultChRot = elm.rot !== void ? +elm.rot
 			 : (elm.keepaddition ?  defaultChRot: 0);
-	// grad
+		// grad
 		defaultChGradMode = elm.gradmode !== void ? 
 			elm.gradmode : (elm.keepaddition ? defaultChGradMode : "none");
 		defaultChGradation = elm.gradation !== void ? 
@@ -1027,6 +1043,16 @@ class MessageLayerADV extends MessageLayer {
 			elm.symovemode : (elm.keepaddition ? defaultChSyMoveMode : "none");
 		defaultChSyMove = elm.symove !== void ? 
 			+elm.symove : (elm.keepaddition ? defaultChSyMove : void);
+
+		// 前行フェードアウト
+		defaultChPrevLineFadeout = elm.plfadeout !== void ?
+			+elm.plfadeout : (elm.keepaddition ? defaultChPrevLineFadeout : false);
+		defaultChPrevLineTime    = elm.pltime    !== void ?
+			+elm.pltime : (elm.keepaddition ? defaultChPrevLineTime : void);
+		defaultChPrevLineOpacity = elm.plopacity !== void ?
+			+elm.plopacity : (elm.keepaddition ? defaultChPrevLineOpacity : void);
+		defaultChPrevLineDelay   = elm.pldelay   !== void ?
+			+elm.pldelay : (elm.keepaddition ? defaultChPrevLineDelay : void);
 	}
 
 	function resetStyle() {
@@ -1065,6 +1091,11 @@ class MessageLayerADV extends MessageLayer {
 		chSxMove = defaultChSxMove;
 		chSyMoveMode = defaultChSyMoveMode;
 		chSyMove = defaultChSyMove;
+
+		chPrevLineFadeout = defaultChPrevLineFadeout;
+		chPrevLineTime    = defaultChPrevLineTime;
+		chPrevLineOpacity = defaultChPrevLineOpacity;
+		chPrevLineDelay   = defaultChPrevLineDelay;
 	}
 
 	function internalAssign(src, copyvisiblestate) {
@@ -1119,6 +1150,11 @@ class MessageLayerADV extends MessageLayer {
 
 		rubyAlign = src.rubyAlign;	defaultRubyAlign = src.defaultRubyAlign;
 		rubyOverflow = src.rubyOverflow;	defaultRubyOverflow = src.defaultRubyOverflow;
+
+		chPrevLineFadeout = src.chPrevLineFadeout; defaultChPrevLineFadeout = src.defaultChPrevLineFadeout;
+		chPrevLineTime    = src.chPrevLineTime;    defaultChPrevLineTime    = src.defaultChPrevLineTime;
+		chPrevLineOpacity = src.chPrevLineOpacity; defaultChPrevLineOpacity = src.defaultChPrevLineOpacity;
+		chPrevLineDelay   = src.chPrevLineDelay;   defaultChPrevLineDelay   = src.defaultChPrevLineDelay;
 	}
 
 	function store() {
@@ -1173,6 +1209,12 @@ class MessageLayerADV extends MessageLayer {
 
 		dic.rubyAlign = rubyAlign;	dic.defaultRubyAlign = defaultRubyAlign;
 		dic.rubyOverflow = rubyOverflow;	dic.defaultRubyOverflow = defaultRubyOverflow;
+
+		dic.chPrevLineFadeout = chPrevLineFadeout; dic.defaultChPrevLineFadeout = defaultChPrevLineFadeout;
+		dic.chPrevLineTime    = chPrevLineTime;    dic.defaultChPrevLineTime    = defaultChPrevLineTime;
+		dic.chPrevLineOpacity = chPrevLineOpacity; dic.defaultChPrevLineOpacity = defaultChPrevLineOpacity;
+		dic.chPrevLineDelay   = chPrevLineDelay;   dic.defaultChPrevLineDelay   = defaultChPrevLineDelay;
+
 		return dic;
 	}
 
@@ -1252,6 +1294,11 @@ class MessageLayerADV extends MessageLayer {
 
 		rubyAlign = dic.rubyAlign;	defaultRubyAlign = dic.defaultRubyAlign;
 		rubyOverflow = dic.rubyOverflow;	defaultRubyOverflow = dic.defaultRubyOverflow;
+
+		chPrevLineFadeout = dic.chPrevLineFadeout; defaultChPrevLineFadeout = dic.defaultChPrevLineFadeout;
+		chPrevLineTime    = dic.chPrevLineTime;    defaultChPrevLineTime    = dic.defaultChPrevLineTime;
+		chPrevLineOpacity = dic.chPrevLineOpacity; defaultChPrevLineOpacity = dic.defaultChPrevLineOpacity;
+		chPrevLineDelay   = dic.chPrevLineDelay;   defaultChPrevLineDelay   = dic.defaultChPrevLineDelay;
 	}
 
 /*--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=-
