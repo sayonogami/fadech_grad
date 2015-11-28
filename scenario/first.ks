@@ -31,7 +31,12 @@ Scripts.execStorage("MessageLayerADV.tjs");
 @resetfont
 
 @setDefaultChGradation color="0xFF0000,0xFF0000,0xFF0000,0xFFFFFF,0xFF0000,0xFF0000,0xFF0000" method="Rect" recttype=1 ch=false edge
-@defstyle plfadeout pltime=200 plopacity=64 pldelay=10
+; 前行フェードアウト
+; plfadeout(true/false) :: 前行フェードを行うか
+; pltime :: フェード時間
+; plopacity :: フェード後の透明度
+; pldelay :: 1文字ずつ順番にフェードアウトを行う場合の、次の文字に行くまでの時間。0で全文字同時フェード
+@defstyle plfadeout pltime=400 plopacity=64 pldelay=2
 @resetChGradation
 
 
