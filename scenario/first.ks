@@ -31,7 +31,9 @@ Scripts.execStorage("MessageLayerADV.tjs");
 @resetfont
 
 @setDefaultChGradation color="0xFF0000,0xFF0000,0xFF0000,0xFFFFFF,0xFF0000,0xFF0000,0xFF0000" method="Rect" recttype=1 ch=false edge
+@defstyle plfadeout pltime=200 plopacity=64 pldelay=10
 @resetChGradation
+
 
 @backlaych
 @image layer="base" storage="mori" page=back

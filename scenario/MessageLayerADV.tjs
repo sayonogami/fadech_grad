@@ -78,14 +78,14 @@ class MessageLayerADV extends MessageLayer {
 	var defaultChSyMoveMode = "none", defaultChSyMove;
 
 	// 前行フェードアウト
-	var chPrevLineFadeout = true;
-	var chPrevLineTime = 300;
-	var chPrevLineOpacity = 128;
-	var chPrevLineDelay = 4;
-	var defaultChPrevLineFadeout = true;
-	var defaultChPrevLineTime = 300;
-	var defaultChPrevLineOpacity = 128;
-	var defaultChPrevLineDelay = 4;
+	var chPrevLineFadeout = false;
+	var chPrevLineTime = 0;
+	var chPrevLineOpacity = 0;
+	var chPrevLineDelay = 0;
+	var defaultChPrevLineFadeout = false;
+	var defaultChPrevLineTime = 0;
+	var defaultChPrevLineOpacity = 0;
+	var defaultChPrevLineDelay = 0;
 
 	var cx, cy;	// get_cx, get_cy
 	var currentRubyAlign = "e"; // 次の文字に対するルビの割り付け方法
