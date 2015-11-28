@@ -79,13 +79,13 @@ class MessageLayerADV extends MessageLayer {
 
 	// 前行フェードアウト
 	var chPrevLineFadeout = true;
-	var chPrevLineTime = 500;
+	var chPrevLineTime = 300;
 	var chPrevLineOpacity = 128;
-	var chPrevLineDelay = 0;
+	var chPrevLineDelay = 4;
 	var defaultChPrevLineFadeout = true;
-	var defaultChPrevLineTime = 500;
+	var defaultChPrevLineTime = 300;
 	var defaultChPrevLineOpacity = 128;
-	var defaultChPrevLineDelay = 0;
+	var defaultChPrevLineDelay = 4;
 
 	var cx, cy;	// get_cx, get_cy
 	var currentRubyAlign = "e"; // 次の文字に対するルビの割り付け方法
@@ -723,9 +723,8 @@ class MessageLayerADV extends MessageLayer {
 
 	function forEachPrevChFadeout() {
 		flag_PreviousLineFadeoutStart = false;
-		var str;
 		for(var i=0;i<currentCh;i++) {
-			with(processedfadeChLayers[i]) { dm(i); str += ","+.__id; .fadeout(); }
+			with(processedfadeChLayers[i]) { .fadeout(chPrevLineDelay*i); }
 		}
 	}
 
