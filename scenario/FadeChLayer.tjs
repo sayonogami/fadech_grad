@@ -880,7 +880,7 @@ class FadeChLayer extends FadeLayer {
 				ml.chPrevLineOpacity,
 				(ml.processChnInF ? 0 : ml.chPrevLineTime),
 				,
-				delay,
+				delay+1,	// 登録タイミングで最終状態に移行させないよう、1を足す
 				afterLayerMoving);
 	}
 
