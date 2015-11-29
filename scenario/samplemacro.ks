@@ -1,5 +1,10 @@
 @macro name="lr"
 	@waitfadech
+; @setpreviouslinefadeout
+; 	このタグを通った後、次の文字が表示されたとき、
+; 	現在フェードアウトしていない文字列をフェードアウトする。
+; 	ただし@styleのplfadeoutがfalseのときに表示された文字は
+; 	フェードアウトしない
 	@setpreviouslinefadeout
 	@l
 	@r
